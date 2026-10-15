@@ -70,11 +70,32 @@ const MOBILE_MAX_PX = 700;
 /** 62rem: where the three-column module opens and the identity becomes 14rem. */
 const MODULE_MIN_PX = 992;
 
+/*
+ * Every design, not only the default one.
+ *
+ * The three differ in their type and space scales before they differ in
+ * anything else, so a touch target that clears 44px in Record's spacing can
+ * fail in Instrument's, which is the tightest of the three, and a line that
+ * clears the 16px body floor in Feature can fall under it in Instrument, which
+ * is the smallest. Checking only the default checks the design least likely to
+ * break.
+ *
+ * Applied by seeding the same localStorage key the switcher writes, in an init
+ * script so it is set before the page's own head script reads it. Driving the
+ * radio button instead would test the control rather than the design, and
+ * would not survive a navigation.
+ */
+const THEMES = ['a', 'b', 'c'];
+
 const browser = await chromium.launch({ executablePath: EXEC, args: ['--no-sandbox'] });
 const problems = [];
 
 for (const vp of VIEWPORTS) {
+  for (const theme of THEMES) {
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
+  await ctx.addInitScript((t) => {
+    try { localStorage.setItem('demo-theme', t); localStorage.setItem('demo-switcher', 'shut'); } catch {}
+  }, theme);
   const page = await ctx.newPage();
 
   for (const path of PAGES) {
@@ -197,7 +218,7 @@ for (const vp of VIEWPORTS) {
       { minTouch: MIN_TOUCH_PX },
     );
 
-    const where = `${vp.name}${path}`;
+    const where = `${theme} ${vp.name}${path}`;
     const mobile = vp.width < MOBILE_MAX_PX;
     if (r.overflow) problems.push(`${where}: scrolls sideways (${r.offenders.join(', ')})`);
     if (r.h1 !== 1) problems.push(`${where}: ${r.h1} h1 elements`);
@@ -229,6 +250,7 @@ for (const vp of VIEWPORTS) {
     }
   }
   await ctx.close();
+  }
 }
 
 await browser.close();
@@ -238,4 +260,6 @@ if (problems.length) {
   for (const p of problems) console.error(`  ${p}`);
   process.exit(1);
 }
-console.log(`No problems across ${VIEWPORTS.length} viewports x ${PAGES.length} pages.`);
+console.log(
+  `No problems across ${VIEWPORTS.length} viewports x ${PAGES.length} pages x ${THEMES.length} designs.`,
+);

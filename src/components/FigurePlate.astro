@@ -10,9 +10,11 @@ import { url } from '../lib/paths.ts';
  * citation, the licence and the placeholder mark, in that order, and a figure
  * cannot be added without them because the component will not render one.
  *
- * Every figure here is borrowed from someone else's open-access paper and says
- * so. They stand in for figures from her own papers, which is a swap of the
- * four caption props and the file.
+ * In this demo the figure is synthetic and the citation is invented, and the
+ * caption says so in its own last line rather than leaving a reader to work it
+ * out. Pointing a placeholder at a real paper would be the one thing a
+ * component about crediting sources must not do. Swapping in a real figure is
+ * a change of the file and the four caption props.
  *
  * `loading="lazy"` on all of them, including the one above the fold. The
  * switcher swaps designs without reloading, so every design's markup ships in
@@ -58,7 +60,7 @@ const { src, alt, width, height, label, caption, citation, href, licence, licenc
       <a href={href} rel="noopener">Read the paper</a>. Licensed <a href={licenceHref} rel="noopener">{licence}</a>.
     </span>
     <span class="figure__placeholder">
-      Placeholder — a published figure from another group, standing in for one of the lab's own.
+      Placeholder — a synthetic figure with an invented citation, standing in for one of the group's own.
     </span>
   </figcaption>
 </figure>

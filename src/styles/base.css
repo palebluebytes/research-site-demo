@@ -136,6 +136,27 @@
     layout bug somewhere else entirely.
   */
   /*
+    Forty-four pixels under a thumb, in every design.
+
+    WCAG 2.5.5 is not a design choice, so this is structure and belongs here
+    rather than in whichever design happened to be written first. It was in
+    that design's stylesheet, which is how it came to be true of one design and
+    false of the other two: on a phone their menu, footer and language links
+    came out between 18px and 27px, and nothing said so until the browser check
+    started driving every design rather than only the default.
+
+    `:where()` so this costs no specificity. A design that wants a link back at
+    the height of its own line - which Record does for its menu above 42rem,
+    where the pointer is a mouse - overrides it with a plain selector and wins.
+  */
+  :where(.nav, .identity .social, .section-index, .footer, .locale-nav, .link-list) a,
+  :where(a.skip) {
+    align-items: center;
+    display: inline-flex;
+    min-block-size: 2.75rem;
+  }
+
+  /*
     Shared defaults for the components that arrived after the designs did.
 
     Each of these was added while there was only one design, so its neutral

@@ -1,7 +1,7 @@
 # research-site-demo
 
-A multilingual research-group website: one content model, three locales, and a
-CMS a non-technical owner can run without help.
+A multilingual research-group website: **three designs over one content model**,
+three locales, and a CMS a non-technical owner can run without help.
 
 **The code is real and the content is not.** This is a site I built for a
 research group, with every piece of the client's own material taken out. Their
@@ -14,9 +14,24 @@ points at a real person or organisation. `CREDITS.md` is the one exception, and
 it is meant to be - those are licence attributions.
 
 What is left when the content goes is the part worth showing: the content
-model, the editing surface, the translation machinery and the test suite.
+model, the editing surface, the translation machinery, the three designs and
+the test suite.
 
 ## What to look at first
+
+**Three designs, one build, switched at runtime.** The control sits bottom
+right. Record is achromatic and gridded and stands behind the work; Feature
+sets a display serif over a warm ground and argues that a figure carries the
+evidence; Instrument sets every identifier in monospace on a labelled panel and
+treats the site as something the group keeps. Each carries its own written
+thesis, what it says about whoever runs the site, and — the field that earns
+its place — what it costs, in `src/lib/themes.ts`.
+
+The content, the routes, the markup and the three locales are identical across
+all three. That constraint is the point: anything that differs between them is
+a design decision rather than a difference in what there was to design, which
+is what makes comparing them worth anything. `docs/theme-architecture.md` is
+the map of exactly which levers a design may pull.
 
 **One content spec, three derivations.** `src/schema/collections.ts` describes
 every collection once. `src/content.config.ts` turns it into Zod schemas that

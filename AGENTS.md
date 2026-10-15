@@ -1,9 +1,10 @@
 # AGENTS.md
 
-A public demo of a research-group website. The code is the real thing, built
-for a real client; the content is invented, because the client's own copy,
-photograph, email address, ORCID record and co-authors are not mine to publish.
-`README.md` says which is which and how the pieces fit together.
+A public demo of a research-group website: three designs over one content
+model, in three languages. The code is the real thing, built for a real client;
+the content is invented, because the client's own copy, photograph, email
+address, ORCID record and co-authors are not mine to publish. `README.md` says
+which is which and how the pieces fit together.
 
 ## Working here
 
@@ -25,6 +26,17 @@ photograph, email address, ORCID record and co-authors are not mine to publish.
   that property - a placeholder that resolves is somebody else's page.
   `CREDITS.md` is the exception and is meant to be: those are licence
   attributions to real projects.
+- **Three designs, and no two of their stylesheets can match one document.**
+  Each is scoped to its own `data-theme`, so import order between them cannot
+  matter. Record's is also the default and therefore scoped twice over -
+  `[data-theme='a'], :root:not([data-theme])` - because a reader with no stored
+  choice and no JavaScript still has to get a designed page.
+- **A component's structure goes in `base.css`; its choices go in a design's
+  own file.** The test for which is which: if a design that says nothing about
+  the component would be *broken* without the rule, it is structure. Four
+  components got this wrong by arriving while there was only one design, and a
+  44px tap target got it wrong for long enough to ship two designs that failed
+  WCAG 2.5.5 on a phone. `docs/theme-architecture.md` has the detail.
 - **Three locales, and the count lives in one place.** `LOCALES` in
   `src/lib/i18n.ts` drives the `lang` attribute, every `hreflang`, the
   `x-default`, the menu, the footer switcher, the sitemap alternates and the

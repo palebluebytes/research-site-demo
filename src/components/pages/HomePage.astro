@@ -10,6 +10,9 @@
 import { getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { DEFAULT_LOCALE, type Locale } from '../../lib/i18n.ts';
+import Themed from '../Themed.astro';
+import FigurePlate from '../FigurePlate.astro';
+import placeholderFigure from '../../../public/figures/placeholder-series.svg?url';
 // Commented out with the strip below, because an import nothing uses fails
 // `astro check` under the strict config.
 // import FunderStrip from '../FunderStrip.astro';
@@ -44,6 +47,35 @@ const description =
     validator and the CMS form follow from it.
   */}
   <Content />
+
+  {/*
+    Feature only, and this is the component the Themed wrapper exists for.
+
+    Feature's argument is that a figure carries the evidence where the other
+    two designs carry a list, so a Feature with no figure is a Feature with its
+    thesis removed. The other two designs have no use for one: Record spends
+    its single image on a portrait, and Instrument's position is that a chart
+    belongs in the paper it came from.
+
+    It ships in all three pages and is hidden by the two that do not want it,
+    which is what `display: none` on `.themed` buys - and why the image is
+    `loading="lazy"` even here, so the designs that never show it never fetch
+    it either.
+  */}
+  <Themed themes="b">
+    <FigurePlate
+      src={placeholderFigure}
+      alt="A synthetic plot: three decaying oscillating series with scattered observations."
+      width={1200}
+      height={800}
+      label="Fig. 1"
+      caption="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
+      citation="Tarrant, E., Ipsum, A., Dolor, B. and Amet, C. (2024). Lorem ipsum dolor sit amet consectetur adipiscing elit. Northmoor Journal of Freshwater Science."
+      href="https://doi.org/10.0000/nmr.2024.0117"
+      licence="CC BY 4.0"
+      licenceHref="https://creativecommons.org/licenses/by/4.0/"
+    />
+  </Themed>
 
   {/*
     The home page used to close on who funds the work, and should again once

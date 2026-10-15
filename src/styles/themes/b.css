@@ -7,7 +7,7 @@
  * are tokens, generated from `ThemeSpec` by `Tokens.astro`.
  *
  * The design in one paragraph: Fraunces over Instrument Sans on a warm
- * off-white, with her lavender kept; a content grid whose text column sits off
+ * off-white against a deep carmine; a content grid whose text column sits off
  * the left edge and leaves a wide margin, so a published figure can break out
  * of the column the prose is set in; and a home page that opens on a question
  * rather than on a summary. Colour is editorial — a kicker, a link, a
@@ -21,8 +21,8 @@
  * reading, while the full record stays a plain index below.
  *
  * Deliberately not here: a portrait in the masthead. This design's images are
- * its figures, and Record already spends its one image on a face. Sophie still
- * appears on the team page, which is where a magazine puts its contributors.
+ * its figures, and Record already spends its one image on a face. The people
+ * belong on the team page, which is where a magazine puts its contributors.
  */
 
 @layer base {
@@ -64,7 +64,7 @@
     The accent belongs to links inside prose, where it marks the one word in a
     sentence that goes somewhere. In a list of papers, people or projects every
     entry is a link, so colouring them all says nothing: those are set in the
-    display face at heading colour and turn lavender under the cursor.
+    display face at heading colour and turn carmine under the cursor.
   */
   :root[data-theme='b'] :is(.person__name, .pub__title, .card__title) a {
     color: var(--color-heading);
@@ -385,7 +385,7 @@
 
   /*
     A figure is mounted rather than framed: the image keeps its own white
-    ground and sits on a lavender mat, which is what stops a paper figure
+    ground and sits on a warm mat, which is what stops a paper figure
     reading as a screenshot dropped onto the page.
   */
   :root[data-theme='b'] .figure__image {
