@@ -12,7 +12,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { DEFAULT_LOCALE, type Locale } from '../../lib/i18n.ts';
 import Themed from '../Themed.astro';
 import FigurePlate from '../FigurePlate.astro';
-import placeholderFigure from '../../../public/figures/placeholder-series.svg?url';
 // Commented out with the strip below, because an import nothing uses fails
 // `astro check` under the strict config.
 // import FunderStrip from '../FunderStrip.astro';
@@ -63,8 +62,14 @@ const description =
     it either.
   */}
   <Themed themes="b">
+    {/*
+      `src` is a site-root path, which is what the prop is documented to take:
+      FigurePlate resolves it against the base itself. Handing it a URL a
+      bundler has already resolved applies the base twice, which is invisible
+      at a domain root and a 404 under a project path.
+    */}
     <FigurePlate
-      src={placeholderFigure}
+      src="/figures/placeholder-series.svg"
       alt="A synthetic plot: three decaying oscillating series with scattered observations."
       width={1200}
       height={800}

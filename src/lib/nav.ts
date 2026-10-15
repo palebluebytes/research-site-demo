@@ -20,18 +20,19 @@ export interface NavItem {
 }
 
 /**
- * Sections that are built no longer and linked from nowhere.
+ * The sections, in menu order.
  *
- * Everything here is real work with nothing real in it yet - a team of
- * placeholder people, three placeholder projects, fixtures where a calendar
- * and a photo folder will go. A menu item leading to a page of invented
- * content is worse than a menu that is short.
+ * All of them are routed, in all three locales. In the client deployment this
+ * came from, six of these were shelved: their content was placeholder, and a
+ * menu item leading to a page of invented content is worse than a menu that is
+ * short.
  *
- * Nothing is deleted. Each one's page lives in `src/pages/` under a leading
- * underscore, which is how Astro says "compile this, do not route it", so the
- * code keeps pace with the rest of the site instead of rotting in the history.
- * Bringing a section back is two edits: drop the `_` from its filename, and
- * drop `shelved` from its entry below.
+ * This is a design demo, and that calculation inverts. Every page here is
+ * invented and says so, and three designs cannot be compared on two page
+ * shapes - a card grid, a dated list, a photo grid and a person's page are
+ * each a different problem, and a design that handles a prose page well can
+ * still fall over on a grid. Shipping the whole set is what makes the switcher
+ * worth having.
  */
 export const COLLECTION_NAV: NavItem[] = [
   { labelKey: 'navPublications', href: '/publications', order: 3 },
@@ -41,26 +42,25 @@ export const COLLECTION_NAV: NavItem[] = [
   // at the top level is the fastest thing that separates a research group's
   // site from a departmental template, and it is a claim about how the lab
   // works rather than a decoration.
-  { labelKey: 'navSoftware', href: '/software', order: 4, shelved: true },
-  { labelKey: 'navTeam', href: '/team', order: 5, shelved: true },
-  { labelKey: 'navProjects', href: '/projects', order: 6, shelved: true },
-  { labelKey: 'navNews', href: '/news', order: 7, shelved: true },
-  { labelKey: 'navEvents', href: '/events', order: 8, shelved: true },
-  { labelKey: 'navGallery', href: '/gallery', order: 9, shelved: true },
+  { labelKey: 'navSoftware', href: '/software', order: 4 },
+  { labelKey: 'navTeam', href: '/team', order: 5 },
+  { labelKey: 'navProjects', href: '/projects', order: 6 },
+  { labelKey: 'navNews', href: '/news', order: 7 },
+  { labelKey: 'navEvents', href: '/events', order: 8 },
+  { labelKey: 'navGallery', href: '/gallery', order: 9 },
 ];
 
 /**
- * Pages-collection entries that are shelved the same way.
+ * Pages-collection entries the site compiles but does not publish.
  *
- * Join us describes positions that are not open yet. It cannot be
- * underscore-prefixed like the others, because it is not a route file: it is
- * Markdown rendered by `[slug].astro`, which filters on this list. The file
- * stays in the collection and the CMS keeps offering it, so the text can be
- * written before the page goes back.
+ * Empty here, and kept because the mechanism is the point: a Page is Markdown
+ * rendered by `[slug].astro`, so it cannot be hidden by the underscore trick a
+ * route file uses. Naming one here keeps it in the collection and in the CMS,
+ * where its text can be written before the page goes live.
  */
-export const SHELVED_PAGES = ['join-us'];
+export const SHELVED_PAGES: string[] = [];
 
-/** The menu, with the shelved sections taken out. */
+/** The menu, with any shelved section taken out. */
 export const NAV = COLLECTION_NAV.filter((item) => !item.shelved);
 
 // /how-this-works is deliberately absent: it is a manual for whoever edits the

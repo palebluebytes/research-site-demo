@@ -113,9 +113,8 @@ describe('every page renders the index under the heading it indexes', () => {
   const PAGES = [
     '../src/components/pages/ContentPage.astro',
     '../src/components/pages/PublicationsPage.astro',
-    // Shelved, and still compiled: see SHELVED_PAGES in src/lib/nav.ts.
-    '../src/pages/_events.astro',
-    '../src/pages/_team/index.astro',
+    '../src/components/pages/EventsPage.astro',
+    '../src/components/pages/TeamIndexPage.astro',
   ];
 
   it.each(PAGES)('%s puts <SectionIndex> straight after its <h1>', (file) => {

@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { url } from '../../lib/paths.ts';
+import { formatDate, localePath, t, type Locale } from '../../lib/i18n.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const s = t(locale);
+
+const news = (await getCollection('news')).sort(
+  (a, b) => (b.data.date as Date).getTime() - (a.data.date as Date).getTime(),
+);
+---
+<BaseLayout
+  title={s('navNews')}
+  description={s('newsDescription')}
+  locale={locale}
+  path="/news"
+>
+  <h1>{s('navNews')}</h1>
+
+  <ul class="pubs pubs--dated">
+    {news.map((item) => (
+      <li class="pub">
+        {/* The link stays inside the reader's language: a news item read in
+            Spanish should not land them on the English one. */}
+        <div class="pub__title"><a href={url(localePath(locale, `/news/${item.id}`))}>{item.data.title}</a></div>
+        <p class="pub__meta"><time datetime={(item.data.date as Date).toISOString()}>{formatDate(locale, item.data.date as Date)}</time></p>
+        {item.data.summary && <p>{item.data.summary}</p>}
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

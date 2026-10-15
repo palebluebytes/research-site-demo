@@ -58,12 +58,17 @@ which is which and how the pieces fit together.
 - **The site is light-only and has no dark palette.** `src/admin/` is the
   exception: the CMS shell is a tool surface and keeps its own `light-dark()`
   pairs.
-- **Six of the site's sections are shelved, not deleted.** Team, Software &
-  data, Projects, News, Events, Gallery and Join us hold placeholder content
-  only, so they are built no longer and linked from nowhere. Their pages sit in
-  `src/pages/` under a leading underscore and still typecheck; `src/lib/nav.ts`
-  holds the menu entries behind a `shelved` flag and the `SHELVED_PAGES` list.
-  Keep them compiling when you change anything shared.
+- **Every section is routed, in every locale - 80 pages.** The client
+  deployment this came from shelved six of them, because a menu item leading to
+  a page of invented content is worse than a short menu. Here every page is
+  invented and says so, and the page shapes are the point: three designs cannot
+  be compared on one layout. The shelving mechanism is still in `src/lib/nav.ts`
+  (`shelved`, `SHELVED_PAGES`) with nothing in it, and `test/shelved.test.ts`
+  still asserts the rule rather than today's empty state.
+- **A page is routed once per locale and its body lives in
+  `src/components/pages/`.** The files under `src/pages/` are three lines each.
+  Put markup in the component; a route file that grows a body is a page that
+  now differs between languages.
 - **`src/schema/collections.ts` is the single source for the content model.**
   It generates both the Zod schema and `public/admin/config.yml`; commit the
   regenerated config alongside any change to it.

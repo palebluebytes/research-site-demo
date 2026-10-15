@@ -1,21 +1,33 @@
 ---
+/**
+ * The people, grouped by rank rather than listed flat.
+ *
+ * Seniority drives the order because the ranks are declared in that order in
+ * the schema, not because anyone sorted by it here: `PERSON_RANKS` is the one
+ * place the order lives, and the in-page index is built from the same groups
+ * the page renders, so it cannot point at a heading that is not there.
+ */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PeopleGrid from '../../components/PeopleGrid.astro';
-import SectionIndex from '../../components/SectionIndex.astro';
+import PeopleGrid from '../PeopleGrid.astro';
+import SectionIndex from '../SectionIndex.astro';
 import { PERSON_RANKS } from '../../schema/collections.ts';
+import { site } from '../../lib/site.ts';
+import { plural, t, type Locale } from '../../lib/i18n.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const s = t(locale);
 
 const people = await getCollection('people');
 
 /** Rank names become the anchors the in-page index points at. */
 const anchor = (rank: string) => rank.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-// Group by rank in the order ranks are declared, so seniority drives the page
-// rather than alphabetical accident.
 const groups = PERSON_RANKS.map((rank) => ({
   rank,
   id: anchor(rank),
-  // Alumni are part of the record but not the answer to "who is in this lab":
+  // Alumni are part of the record but not the answer to "who is in this group":
   // they are folded away so the people currently here are not read past. This
   // is a ranking of the content rather than a look, so every design gets it.
   collapsed: rank === 'Alumni',
@@ -25,14 +37,17 @@ const groups = PERSON_RANKS.map((rank) => ({
 })).filter((group) => group.members.length > 0);
 
 const sections: [string, string][] = groups.map((group) => [group.id, group.rank]);
-
 ---
-<BaseLayout title="Team" description="People in the Tarrant Lab.">
-  <h1>Team</h1>
-  <SectionIndex sections={sections} heading="Positions" />
+<BaseLayout
+  title={s('navTeam')}
+  description={s('teamDescription', { lab: site.labName })}
+  locale={locale}
+  path="/team"
+>
+  <h1>{s('navTeam')}</h1>
+  <SectionIndex sections={sections} heading={s('positions')} />
   <p class="notice">
-    <strong>Demo content.</strong> Every entry except Esme is a placeholder, shown so the
-    team layout can be judged at realistic size. None of them are real people.
+    <strong>{s('demoContent')}</strong> {s('teamPlaceholderNote')}
   </p>
 
   {groups.map((group) => (
@@ -41,7 +56,7 @@ const sections: [string, string][] = groups.map((group) => [group.id, group.rank
       {group.collapsed ? (
         <details class="people__fold">
           <summary class="people__summary">
-            {group.members.length} former {group.members.length === 1 ? 'member' : 'members'}
+            {s(`formerMembers${plural(group.members.length)}`, { n: group.members.length })}
           </summary>
           <PeopleGrid members={group.members} />
         </details>

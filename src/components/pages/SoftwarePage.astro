@@ -1,11 +1,20 @@
 ---
+/**
+ * Research code and data, named at the top level.
+ *
+ * In the menu directly under Publications, and that placement is the point of
+ * the page: code and data named rather than folded into a link in a footer,
+ * which is the fastest thing separating a research group's site from a
+ * departmental template. See COLLECTION_NAV in src/lib/nav.ts.
+ */
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, type Locale } from '../../lib/i18n.ts';
 
-// In the menu directly under Publications. That placement is the point of the
-// page: code and data named at the top level rather than folded into a GitHub
-// link, which is the fastest thing separating a research group's site from a
-// departmental template. See COLLECTION_NAV in src/lib/nav.ts.
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const s = t(locale);
+
 const sorted = (await getCollection('software')).sort(
   (a, b) => (a.data.order as number) - (b.data.order as number),
 );
@@ -23,15 +32,16 @@ const entries = await Promise.all(
     Content: (await render(entry)).Content,
   })),
 );
-
 ---
-<BaseLayout title="Software and data" description="Research code and data released by the lab.">
-  <h1>Software and data</h1>
+<BaseLayout
+  title={s('navSoftware')}
+  description={s('softwareDescription')}
+  locale={locale}
+  path="/software"
+>
+  <h1>{s('navSoftware')}</h1>
 
-  <p class="lede">
-    Code and data behind the papers, released so the analysis can be read and
-    re-run rather than taken on trust.
-  </p>
+  <p class="lede">{s('softwareLede')}</p>
 
   <ul class="cards">
     {entries.map(({ title, summary, repo, language, doi, Content }) => (
@@ -43,7 +53,7 @@ const entries = await Promise.all(
         <Content />
         {/* One line: Astro turns the newline between two expressions into a
             space of its own, which would double the separator. */}
-        <p class="small muted">{language}{language && doi ? ' — ' : ''}{doi && <a href={`https://doi.org/${doi}`} rel="noopener">doi:{doi}</a>}</p>
+        <p class="small muted">{language}{language && doi ? ' - ' : ''}{doi && <a href={`https://doi.org/${doi}`} rel="noopener">doi:{doi}</a>}</p>
       </li>
     ))}
   </ul>

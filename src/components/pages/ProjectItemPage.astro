@@ -1,0 +1,27 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { url } from '../../lib/paths.ts';
+import { t, type Locale } from '../../lib/i18n.ts';
+
+interface Props {
+  locale: Locale;
+  project: CollectionEntry<'projects'>;
+}
+const { locale, project } = Astro.props;
+const s = t(locale);
+const { Content } = await render(project);
+const data = project.data as Record<string, unknown>;
+---
+<BaseLayout
+  title={data.title as string}
+  description={data.summary as string}
+  locale={locale}
+  path={`/projects/${project.id}`}
+>
+  <h1>{data.title}</h1>
+  <p class="lede">{data.summary}</p>
+  {data.image && <img src={url(data.image as string)} alt={(data.imageAlt as string | undefined) ?? ''} width="1200" height="800" />}
+  <Content />
+  {data.funder && <p class="small muted">{s('fundedBy', { funder: data.funder as string })}</p>}
+</BaseLayout>

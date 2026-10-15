@@ -43,9 +43,19 @@ const VIEWPORTS = [
  * one, on the narrowest viewport. Checking only English checks the easy case.
  */
 const PAGES = [
-  '/', '/research/', '/publications/', '/how-this-works/', '/404.html',
-  '/fr/', '/fr/research/', '/fr/publications/',
-  '/es/', '/es/research/', '/es/publications/',
+  // Every page shape, in the default locale. A design that handles a prose
+  // page can still fall over on a card grid or a photo grid, and those are the
+  // layouts a comparison between designs is actually decided on.
+  '/', '/research/', '/publications/', '/software/', '/projects/', '/news/',
+  '/team/', '/events/', '/gallery/', '/join-us/', '/how-this-works/', '/404.html',
+  // One of each item page: a single record rather than a list of them.
+  '/news/2026-08-lab-opens/', '/projects/catchment-monitoring/', '/team/esme-tarrant/',
+  // The index pages again in the other two locales, where the labels run
+  // longer. "Logiciels et données" is the one most likely to break a menu.
+  '/fr/', '/fr/research/', '/fr/publications/', '/fr/software/', '/fr/projects/',
+  '/fr/news/', '/fr/team/', '/fr/events/', '/fr/gallery/',
+  '/es/', '/es/research/', '/es/publications/', '/es/software/', '/es/projects/',
+  '/es/news/', '/es/team/', '/es/events/', '/es/gallery/',
 ];
 
 /*

@@ -275,6 +275,14 @@
       justify-self: end;
     }
 
+    /*
+      The four facts are one row of flex items separated by rules, so the three
+      that share a wrapper have to join that row rather than stacking inside
+      it. The wrapper exists because Record centres those three as one block
+      under its rule; it stands aside here instead of being removed from the
+      markup, which would cost Record the thing it wraps them for.
+    */
+    :root[data-theme='b'] .identity__address { display: contents; }
     :root[data-theme='b'] .identity__meta {
       column-gap: var(--space-2xs);
       display: flex;

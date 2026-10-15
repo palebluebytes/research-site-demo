@@ -217,6 +217,19 @@
     :root[data-theme='c'] .identity { grid-template-columns: var(--c-rail) minmax(0, 1fr); }
   }
 
+  /*
+    Inner pages carry no portrait: it is rendered only where the person is the
+    subject of the page, because `display: none` hides a box without cancelling
+    its request. The areas above name a `photo` row and column regardless, so
+    without this every inner page opens with an empty 8rem gutter down its
+    left-hand side. Keyed off the absence of the element rather than off the
+    page, so it stays true wherever the portrait is not drawn.
+  */
+  :root[data-theme='c'] .identity:not(:has(.identity__photo)) {
+    grid-template-areas: 'lab' 'name' 'meta' 'social';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   :root[data-theme='c'] .identity__photo {
     border: 1px solid var(--color-border);
     grid-area: photo;
@@ -302,8 +315,18 @@
     grid-area: social;
     margin-block-start: var(--space-2xs);
   }
-  /* Comfortable under a thumb without adding a visible row of padding. */
-  :root[data-theme='c'] .identity .social a { display: inline-block; padding-block: var(--space-2xs); }
+  /*
+    Comfortable under a thumb without adding a visible row of padding.
+
+    `inline-flex`, not `inline-block`: each of these links is a mark beside a
+    word, and in an inline-block box the two wrap onto separate lines at the
+    width this rail is. The shared rule in base.css already sets the alignment
+    and the gap; this only has to not override the display it sets.
+  */
+  :root[data-theme='c'] .identity .social a {
+    display: inline-flex;
+    padding-block: var(--space-2xs);
+  }
 
   @media (min-width: 48rem) {
     /*

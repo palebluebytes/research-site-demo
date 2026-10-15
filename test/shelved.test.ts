@@ -22,11 +22,25 @@ import { COLLECTION_NAV, NAV, SHELVED_PAGES } from '../src/lib/nav.ts';
  * Routed pages are the ones without a leading underscore. The shelved pages
  * themselves still import whatever they like: they are compiled, not served.
  *
+ * Nothing is shelved at the moment - this is a design demo, and every page
+ * shape earns its place by being another thing to compare three designs on.
+ * The rule is still asserted rather than the state: with the list empty these
+ * checks are satisfied trivially, and the day something goes back on the shelf
+ * they bite again without anyone having to remember to re-enable them. A test
+ * deleted because it currently proves nothing is a test nobody writes twice.
+ *
  * Comments are stripped before matching, as in test/single-emission.test.ts:
  * the fix for this on 404.astro is a comment naming both lists and saying
  * which one to reach for, and a naive match reads that as the mistake.
  */
 const PAGES = new URL('../src/pages/', import.meta.url).pathname;
+/*
+ * The page bodies moved here when each page began being routed once per
+ * locale: a route file is three lines and the markup that could render the
+ * wrong menu is in the component. Scanning only `src/pages/` would now be
+ * scanning the three-line files.
+ */
+const PAGE_COMPONENTS = new URL('../src/components/pages/', import.meta.url).pathname;
 
 /** Explaining a rule must not break it. Same treatment as single-emission. */
 function withoutComments(source: string): string {
@@ -50,7 +64,7 @@ function routedPages(dir: string): string[] {
   });
 }
 
-const pages = routedPages(PAGES);
+const pages = [...routedPages(PAGES), ...routedPages(PAGE_COMPONENTS)];
 const shelvedHrefs = COLLECTION_NAV.filter((item) => item.shelved).map((item) => item.href);
 
 describe('the shelved sections are linked from nowhere', () => {
@@ -59,9 +73,11 @@ describe('the shelved sections are linked from nowhere', () => {
     expect(pages.length).toBeGreaterThan(0);
   });
 
-  it('has something shelved to be wrong about', () => {
-    expect(shelvedHrefs.length).toBeGreaterThan(0);
-    expect(SHELVED_PAGES.length).toBeGreaterThan(0);
+  it('agrees with itself about what is shelved', () => {
+    // Vacuous while nothing is shelved, and that is the point: the rule holds
+    // either way, so the list can empty and refill without this file changing.
+    expect(shelvedHrefs.every((href) => href.startsWith('/'))).toBe(true);
+    expect(SHELVED_PAGES.every((id) => !id.startsWith('/'))).toBe(true);
   });
 
   it.each(pages.map((path) => [relative(PAGES, path), path]))(
@@ -83,8 +99,8 @@ describe('the shelved sections are linked from nowhere', () => {
     },
   );
 
-  it('leaves NAV as the strict subset that is actually built', () => {
+  it('leaves NAV as the subset that is actually built', () => {
     expect(NAV.every((item) => !item.shelved)).toBe(true);
-    expect(NAV.length).toBeLessThan(COLLECTION_NAV.length);
+    expect(NAV.length).toBe(COLLECTION_NAV.length - shelvedHrefs.length);
   });
 });

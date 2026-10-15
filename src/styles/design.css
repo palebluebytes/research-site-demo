@@ -260,10 +260,32 @@
       sized tracks on every page and width, because this is not a mistake you
       can see by reading either rule.
     */
+    /*
+      One column, identity then menu then page.
+
+      This band used to set the identity and the menu side by side, with the
+      menu in an `auto` track at the end of the row. That arrangement was built
+      against a three-item menu and it does not survive a nine-item one: an
+      `auto` track sizes to max-content, a flex row never given less than its
+      max-content width has no reason to wrap, so the menu took the whole row
+      and the identity beside it measured 0px. The name disappeared on a
+      tablet.
+
+      Widening the track's floor does not fix that - the maximum is what is
+      doing the damage - so the honest fix is the arrangement. The home page
+      already stacked here for its own reasons, which is the shape this now
+      uses for every page: at this width the menu is a row of its own under
+      the identity, and above 62rem the module takes over and puts it back in
+      a column beside the content.
+
+      Caught by `scripts/check-responsive.mjs`, which compares the named areas
+      against the sized tracks at every width and design: a collapsed track is
+      not something you see by reading either rule.
+    */
     .page {
       align-items: start;
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas: 'identity nav' 'main main';
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'identity' 'nav' 'main';
       /* The bar is back in the flow here, so the page keeps its own padding. */
       padding-block-start: var(--space-l);
     }
@@ -281,24 +303,18 @@
     */
     .page:not(:has(h1.identity__name)) { row-gap: var(--space-s); }
     /*
-      Level with the foot of the strapline, which is where the menu sits in the
-      column above 62rem. Anchored to the bottom of the row rather than the
-      top, so it keeps that relationship whatever the identity grows to.
-    */
-    /*
       Grid placement only. How the menu is drawn at this width - the band
-      undone, the items to the right - is in `components` beside the rest of
-      `.site-nav`, because `components` comes after `layout` in the layer
-      order and a reset written here would lose to it however specific it was.
-    */
-    .page > .site-nav { align-self: end; }
+      undone, the items reading left to right - is in `components` beside the
+      rest of `.site-nav`, because `components` comes after `layout` in the
+      layer order and a reset written here would lose to it however specific
+      it was.
 
-    /* The home page keeps the stack: there the identity is the row, not a label beside the menu. */
-    .page:where(:has(h1.identity__name)) {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: 'identity' 'nav' 'main';
-    }
-    .page:where(:has(h1.identity__name)) > .site-nav {
+      One rule now rather than three: the menu starts at the inline edge on
+      every page, because every page stacks here. The carve-out that used to
+      hand the home page this behaviour is gone with the arrangement that made
+      it necessary.
+    */
+    .page > .site-nav {
       align-self: start;
       justify-content: flex-start;
     }

@@ -1,0 +1,69 @@
+---
+/**
+ * Dates, split into what is coming and what has been.
+ *
+ * Fixtures, not a live calendar, shaped exactly like `@palebluebytes/cms`
+ * returns `CalendarEvent[]`, so wiring a real one later is a one-line swap for
+ * `await fetchEvents({ calendarId, auth })`.
+ *
+ * `splitByDate` takes `now` as an argument rather than reading the clock, so a
+ * test can place an event on either side of the boundary without waiting.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionIndex from '../SectionIndex.astro';
+import { formatEventDate, splitByDate, type CalendarEvent } from '../../lib/events.ts';
+import fixtures from '../../data/fixtures/events.json' with { type: 'json' };
+import { t, type Locale } from '../../lib/i18n.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const s = t(locale);
+
+const events = fixtures as CalendarEvent[];
+const { upcoming, past } = splitByDate(events, new Date());
+
+const sections: [string, string][] = [
+  ['upcoming', s('upcoming')],
+  ...(past.length > 0 ? [['past', s('past')] as [string, string]] : []),
+];
+---
+<BaseLayout
+  title={s('navEvents')}
+  description={s('eventsDescription')}
+  locale={locale}
+  path="/events"
+>
+  <h1>{s('navEvents')}</h1>
+  <SectionIndex sections={sections} heading={s('onThisPage')} />
+
+  <section id="upcoming">
+    <h2>{s('upcoming')}</h2>
+    {upcoming.length === 0
+      ? <p class="muted">{s('nothingScheduled')}</p>
+      : (
+        <ul class="pubs pubs--dated">
+          {upcoming.map((event) => (
+            <li class="pub">
+              <div class="pub__title">{event.summary ?? s('untitledEvent')}</div>
+              <p class="pub__meta">{formatEventDate(event)}{event.location && ` · ${event.location}`}</p>
+              {event.description && <p class="small">{event.description}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+  </section>
+
+  {past.length > 0 && (
+    <section id="past">
+      <h2>{s('past')}</h2>
+      <ul class="pubs pubs--dated">
+        {past.map((event) => (
+          <li class="pub">
+            <div class="pub__title">{event.summary ?? s('untitledEvent')}</div>
+            <p class="pub__meta">{formatEventDate(event)}{event.location && ` · ${event.location}`}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

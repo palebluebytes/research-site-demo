@@ -149,12 +149,23 @@
     the height of its own line - which Record does for its menu above 42rem,
     where the pointer is a mouse - overrides it with a plain selector and wins.
   */
-  :where(.nav, .identity .social, .section-index, .footer, .locale-nav, .link-list) a,
+  :where(.nav, .social, .section-index, .footer, .locale-nav, .link-list) a,
   :where(a.skip) {
     align-items: center;
     display: inline-flex;
     min-block-size: 2.75rem;
   }
+
+  /*
+    A link whose label sits beside a mark needs a gap between the two, in any
+    design. Structure rather than choice: without it the mark butts against the
+    word, and the two are a single phrase either way.
+
+    `.social` and not `.identity .social`: the same list appears on a person's
+    page outside the identity block, and scoping this to where it first
+    appeared is how that copy came to be the one with 18px tap targets.
+  */
+  :where(.social) a { gap: var(--space-3xs); }
 
   /*
     Shared defaults for the components that arrived after the designs did.

@@ -27,6 +27,14 @@ treats the site as something the group keeps. Each carries its own written
 thesis, what it says about whoever runs the site, and — the field that earns
 its place — what it costs, in `src/lib/themes.ts`.
 
+Every section is built, in every language: home, research, publications,
+software and data, projects, news, team, events, gallery and a join-us page,
+plus an item page for each project, news item and person. Eighty pages. That
+is not padding - a prose page, a card grid, a dated list, a photo grid and a
+person's record are five different problems, and a design that handles the
+first well can still fall over on the third. Three designs cannot be compared
+on one page shape.
+
 The content, the routes, the markup and the three locales are identical across
 all three. That constraint is the point: anything that differs between them is
 a design decision rather than a difference in what there was to design, which

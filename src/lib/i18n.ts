@@ -71,6 +71,34 @@ const en = {
   previewDesign: 'Preview design',
   theThreeDesigns: 'The three designs',
 
+  softwareDescription: 'Research code and data released by the group.',
+  softwareLede: 'Code and data behind the papers, released so the analysis can be read and re-run rather than taken on trust.',
+
+  galleryDescription: 'Photographs from the group.',
+  galleryUnavailable: 'Gallery unavailable.',
+
+  newsDescription: 'Announcements and updates from the group.',
+
+  projectsDescription: 'Research projects running in the group.',
+  fundedBy: 'Funded by {funder}',
+
+  teamDescription: 'People in the {lab}.',
+  positions: 'Positions',
+  demoContent: 'Demo content.',
+  teamPlaceholderNote: 'Every entry here is a placeholder, shown so the team layout can be judged at realistic size. None of them are real people.',
+  formerMembers_one: '{n} former member',
+  formerMembers_other: '{n} former members',
+  placeholderEntry: 'Placeholder entry.',
+  notARealPerson: 'This is not a real person.',
+  personInLab: '{name}, {rank} in the {lab}.',
+  websiteLabel: 'Website',
+
+  eventsDescription: 'Seminars, group meetings and other dates.',
+  upcoming: 'Upcoming',
+  past: 'Past',
+  nothingScheduled: 'Nothing scheduled.',
+  untitledEvent: 'Untitled event',
+
   lastUpdatedFrom: 'Last updated from',
   lastUpdatedOn: 'on',
 
@@ -114,6 +142,34 @@ const fr: Record<StringKey, string> = {
   previewDesign: 'Aperçu du design',
   theThreeDesigns: 'Les trois designs',
 
+  softwareDescription: 'Code et données de recherche publiés par le groupe.',
+  softwareLede: 'Le code et les données derrière les articles, publiés pour que l’analyse puisse être lue et rejouée plutôt que crue sur parole.',
+
+  galleryDescription: 'Photographies du groupe.',
+  galleryUnavailable: 'Galerie indisponible.',
+
+  newsDescription: 'Annonces et actualités du groupe.',
+
+  projectsDescription: 'Projets de recherche en cours dans le groupe.',
+  fundedBy: 'Financé par {funder}',
+
+  teamDescription: 'Les membres du {lab}.',
+  positions: 'Postes',
+  demoContent: 'Contenu de démonstration.',
+  teamPlaceholderNote: 'Chaque entrée est un espace réservé, affiché pour que la mise en page de l’équipe puisse être jugée à taille réelle. Aucune ne correspond à une personne réelle.',
+  formerMembers_one: '{n} ancien membre',
+  formerMembers_other: '{n} anciens membres',
+  placeholderEntry: 'Entrée fictive.',
+  notARealPerson: 'Il ne s’agit pas d’une personne réelle.',
+  personInLab: '{name}, {rank} au {lab}.',
+  websiteLabel: 'Site web',
+
+  eventsDescription: 'Séminaires, réunions de groupe et autres dates.',
+  upcoming: 'À venir',
+  past: 'Passés',
+  nothingScheduled: 'Rien de prévu.',
+  untitledEvent: 'Événement sans titre',
+
   lastUpdatedFrom: 'Dernière mise à jour depuis',
   lastUpdatedOn: 'le',
 
@@ -156,6 +212,34 @@ const es: Record<StringKey, string> = {
   designPreviewLabel: 'Vista previa del diseño',
   previewDesign: 'Vista previa del diseño',
   theThreeDesigns: 'Los tres diseños',
+
+  softwareDescription: 'Código y datos de investigación publicados por el grupo.',
+  softwareLede: 'El código y los datos detrás de los artículos, publicados para que el análisis pueda leerse y repetirse en lugar de aceptarse sin más.',
+
+  galleryDescription: 'Fotografías del grupo.',
+  galleryUnavailable: 'Galería no disponible.',
+
+  newsDescription: 'Anuncios y novedades del grupo.',
+
+  projectsDescription: 'Proyectos de investigación en curso en el grupo.',
+  fundedBy: 'Financiado por {funder}',
+
+  teamDescription: 'Personas del {lab}.',
+  positions: 'Puestos',
+  demoContent: 'Contenido de demostración.',
+  teamPlaceholderNote: 'Cada entrada es un marcador de posición, mostrada para poder juzgar la maquetación del equipo a tamaño real. Ninguna corresponde a una persona real.',
+  formerMembers_one: '{n} antiguo miembro',
+  formerMembers_other: '{n} antiguos miembros',
+  placeholderEntry: 'Entrada ficticia.',
+  notARealPerson: 'No es una persona real.',
+  personInLab: '{name}, {rank} en el {lab}.',
+  websiteLabel: 'Sitio web',
+
+  eventsDescription: 'Seminarios, reuniones del grupo y otras fechas.',
+  upcoming: 'Próximos',
+  past: 'Pasados',
+  nothingScheduled: 'Nada programado.',
+  untitledEvent: 'Evento sin título',
 
   lastUpdatedFrom: 'Última actualización desde',
   lastUpdatedOn: 'el',
