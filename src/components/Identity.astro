@@ -75,8 +75,17 @@ const profiles: { name: IconName; label: string; href: string }[] = [
     declares its fields in this order, and it says nothing about which line is
     which to anyone reading either file.
   */}
+  {/*
+    Each line carries the name of the field it came from. The keys are hidden
+    by default and shown only by the design that sets this block as a keyed
+    metadata rail; to the other two a hidden <span> inside a <p> changes
+    nothing about the <p>. Written in the markup rather than generated in CSS
+    so they are real text a screen reader reads and a translator can reach.
+
+    One line each, so no whitespace lands between a key and its value.
+  */}
   <div class="identity__meta">
-    <p class="identity__discipline">{site.discipline}</p>
+    <p class="identity__discipline"><span class="identity__key">role</span>{site.discipline}</p>
     {/*
       The three lines of where they work are one thing, so they are one
       element. It is what lets the masthead centre the address in the room
@@ -88,9 +97,9 @@ const profiles: { name: IconName; label: string; href: string }[] = [
       they are.
     */}
     <div class="identity__address">
-      <p class="identity__affiliation">{site.jobTitle}</p>
-      <p class="identity__affiliation">{site.department}</p>
-      <p class="identity__affiliation">{site.institution}</p>
+      <p class="identity__affiliation"><span class="identity__key">title</span>{site.jobTitle}</p>
+      <p class="identity__affiliation"><span class="identity__key">dept</span>{site.department}</p>
+      <p class="identity__affiliation"><span class="identity__key">inst</span>{site.institution}</p>
     </div>
   </div>
   <div class="social">

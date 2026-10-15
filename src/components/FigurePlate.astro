@@ -1,0 +1,64 @@
+---
+import { url } from '../lib/paths.ts';
+
+/**
+ * A published figure, mounted and credited.
+ *
+ * The imagery on a lab site is usually stock photography of glassware. This is
+ * the alternative: the figures the work actually produced, each one carrying
+ * the paper it came from. That means the caption is not decoration - it is the
+ * citation, the licence and the placeholder mark, in that order, and a figure
+ * cannot be added without them because the component will not render one.
+ *
+ * Every figure here is borrowed from someone else's open-access paper and says
+ * so. They stand in for figures from her own papers, which is a swap of the
+ * four caption props and the file.
+ *
+ * `loading="lazy"` on all of them, including the one above the fold. The
+ * switcher swaps designs without reloading, so every design's markup ships in
+ * every page: an eager figure would be downloaded by the two designs that
+ * never show it.
+ */
+interface Props {
+  /** Site-root path of the image, e.g. `/figures/x.webp`. */
+  src: string;
+  alt: string;
+  /** Intrinsic pixel size, so the page does not jump as the image loads. */
+  width: number;
+  height: number;
+  /** Figure number as it appears on this page, e.g. `Fig. 1`. */
+  label: string;
+  /** What the figure shows, in plain words. */
+  caption: string;
+  /** The paper, cited. */
+  citation: string;
+  /** Where that paper is. */
+  href: string;
+  /** Licence name and its deed, e.g. `CC BY 4.0`. */
+  licence: string;
+  licenceHref: string;
+}
+const { src, alt, width, height, label, caption, citation, href, licence, licenceHref } = Astro.props;
+---
+<figure class="figure">
+  <img
+    class="figure__image"
+    src={url(src)}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption class="figure__caption">
+    <span class="figure__label">{label}</span>
+    <span class="figure__what">{caption}</span>
+    <span class="figure__credit">
+      <cite class="figure__citation">{citation}</cite>
+      <a href={href} rel="noopener">Read the paper</a>. Licensed <a href={licenceHref} rel="noopener">{licence}</a>.
+    </span>
+    <span class="figure__placeholder">
+      Placeholder — a published figure from another group, standing in for one of the lab's own.
+    </span>
+  </figcaption>
+</figure>

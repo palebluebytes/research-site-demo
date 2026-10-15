@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DESIGN } from '../src/lib/design.ts';
+import { THEMES } from '../src/lib/themes.ts';
 
 /**
  * The palette's contrast claims, checked rather than asserted in a comment.
@@ -44,6 +45,39 @@ describe('contrast', () => {
     expect(contrast(c.text!, c.bg!)).toBe(contrast(c.bg!, c.text!));
   });
 });
+
+/*
+ * Every design, not only the one that happens to be the default.
+ *
+ * Three palettes ship in one build and a reader switches between them at
+ * runtime, so a design nobody checked is a design somebody can be looking at.
+ * The pairs are the same for all three because they are the same page: body on
+ * the ground, muted on the ground and on a panel, a link in prose and on a
+ * panel, and white out of the accent.
+ *
+ * Grounds a design does not declare are skipped rather than failed. Feature
+ * has a `wash` that the other two have no use for, and Instrument a
+ * `hairline`; asserting a token into existence because another design needed
+ * one is how a palette grows fields nothing reads.
+ */
+describe.each(THEMES.map((theme) => [theme.name, theme.colors] as const))(
+  '%s clears AA',
+  (_name, colors) => {
+    const BODY = 4.5;
+    const grounds = ['bg', 'surface', 'wash'].filter((key) => key in colors);
+
+    it.each(['text', 'muted', 'heading', 'accent'])('%s on every ground it can sit on', (fg) => {
+      const failures = grounds
+        .map((bg) => ({ bg, ratio: contrast(colors[fg]!, colors[bg]!) }))
+        .filter(({ ratio }) => ratio < BODY);
+      expect(failures).toEqual([]);
+    });
+
+    it('white out of the accent', () => {
+      expect(contrast(colors.accentText!, colors.accent!)).toBeGreaterThanOrEqual(BODY);
+    });
+  },
+);
 
 describe('text clears AA', () => {
   const BODY = 4.5;
@@ -94,9 +128,15 @@ describe('non-text contrast clears AA', () => {
 
 describe('every grey is neutral', () => {
   /*
-    The claim the palette rests on: the accent is the only colour on the page,
-    so it always means something. A grey with a cast is a second hue nobody
-    declared.
+    The claim Record's palette rests on: the accent is the only colour on the
+    page, so it always means something. A grey with a cast is a second hue
+    nobody declared.
+
+    Record only, and deliberately. Feature's greys are warm because a neutral
+    grey next to its warm ground reads as dirty, and Instrument's are cool for
+    the same reason in the other direction - so this is one design's argument
+    rather than a rule, and asserting it across all three would fail two
+    designs for doing what they say they do.
   */
   const greys = Object.entries(c).filter(([name]) => name !== 'accent' && name !== 'accentText');
 

@@ -16,10 +16,21 @@ import {
   t,
   type Locale,
 } from '../lib/i18n.ts';
+import ThemeSwitcher from '../components/ThemeSwitcher.astro';
+import { DEFAULT_THEME } from '../lib/themes.ts';
 import '../styles/base.css';
-// The design's own file, extending the layers base.css declares. Imported
-// after it so a same-specificity rule resolves in the design's favour.
+/*
+ * The three designs, each scoped to its own `data-theme`, imported after
+ * base.css so a same-specificity rule resolves in a design's favour rather
+ * than the shared default's. Order between the three does not matter - no two
+ * of them can ever match the same document - which is the property that makes
+ * a runtime switcher safe rather than a cascade race.
+ */
 import '../styles/design.css';
+import '../styles/themes/b.css';
+import '../styles/themes/c.css';
+/* Not one of the designs: the control you compare them with. */
+import '../styles/demo.css';
 
 interface Props {
   title: string;
@@ -136,6 +147,25 @@ const localeLinks = LOCALES.map((alt) => ({
     <meta name="twitter:card" content="summary_large_image" />
     <Fonts />
     <Tokens />
+
+    {/*
+      Applies the stored design before the first paint.
+      
+      Inline and in the head, not in the switcher's own script at the end of
+      the body: by then the page has already painted in the default design, and
+      a reader who chose Feature last visit would watch Record flash past
+      first. Reading localStorage synchronously here is the one case where
+      blocking parse is the cheaper option.
+    */}
+    <script is:inline define:vars={{ fallback: DEFAULT_THEME }}>
+      try {
+        const stored = localStorage.getItem('demo-theme');
+        if (stored) document.documentElement.dataset.theme = stored;
+      } catch {
+        // Private browsing or blocked site data: the default design, which is
+        // what the bare `:root` token block and `:not([data-theme])` exist for.
+      }
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">{s('skipToContent')}</a>
@@ -225,5 +255,13 @@ const localeLinks = LOCALES.map((alt) => ({
         </nav>
       </div>
     </footer>
+
+    {/*
+      Last in the document, because it is the only thing on the page that is
+      not the site. A reader following the page by keyboard or screen reader
+      meets the whole of it before meeting the control that changes how it
+      looks, which is the right order for a device that exists to be used once.
+    */}
+    <ThemeSwitcher locale={locale} />
   </body>
 </html>

@@ -25,7 +25,39 @@
  * instead of a hero, so the first thing read is who this is and what they do.
  */
 
+/*
+ * Why every rule in this file is nested inside a selector.
+ *
+ * Three designs share this build and the reader switches between them at
+ * runtime by `data-theme`, so all three stylesheets are present at once and
+ * each has to speak only for itself. Feature and Instrument were always
+ * scoped that way (`styles/themes/b.css`, `styles/themes/c.css`); this file
+ * was not, because for a while there was only one design and `:root` was the
+ * honest place for it.
+ *
+ * The scope is written as two selectors rather than one. `[data-theme='a']` is
+ * Record chosen explicitly, and `:not([data-theme])` is Record as the default
+ * a reader gets before any script runs - and if none ever does. Without the
+ * second one the page would render unstyled for anyone with JavaScript off,
+ * which is most of the point of a static site.
+ *
+ * Nesting rather than a prefix on each selector: the rules inside are
+ * unchanged and reviewable as themselves, and a bare `.thing` nested here
+ * resolves to a descendant of the scope exactly as a hand-written prefix
+ * would. The one rule that could not survive the move is the `--menu-bar`
+ * custom property, which was set on `:root` and is now set on `&`: nested,
+ * `:root` would have meant a `:root` inside a `:root`.
+ *
+ * The layers are still the layers `base.css` ordered, so the scope changes
+ * which designs these rules apply to and not where they sit in the cascade.
+ */
+
 @layer base {
+  /*
+   * Record's own rules, scoped. See the note at the top of this file.
+   */
+  :root[data-theme='a'], :root:not([data-theme]) {
+
   /*
     Page frame.
 
@@ -39,7 +71,7 @@
     and read by nothing else, so the two cannot disagree - which is the failure
     this kind of offset always has.
   */
-  :root { --menu-bar: calc(2.75rem + var(--space-2xs) + var(--space-3xs) + var(--rule-heavy)); }
+  & { --menu-bar: calc(2.75rem + var(--space-2xs) + var(--space-3xs) + var(--rule-heavy)); }
 
   body {
     /* Archivo ships real weights and a real italic; never let the browser fake one. */
@@ -121,9 +153,16 @@
   hr {
     border-block-start: var(--rule-strong) solid var(--color-heading);
   }
+
+  }
 }
 
 @layer layout {
+  /*
+   * Record's own rules, scoped. See the note at the top of this file.
+   */
+  :root[data-theme='a'], :root:not([data-theme]) {
+
   /*
     A phone gets the page, and the menu gets out of the way.
 
@@ -456,9 +495,22 @@
       position: sticky;
     }
   }
+
+  }
 }
 
 @layer components {
+  /*
+   * Record's own rules, scoped. See the note at the top of this file.
+   */
+  :root[data-theme='a'], :root:not([data-theme]) {
+
+  /*
+    Record's share of the per-design markup. Every design ends its stylesheet
+    with this one line; see `.themed` in base.css for why they fail closed.
+  */
+  .themed[data-themes~='a'] { display: contents; }
+
   /* ---- Identity: the strapline that signs the site ---------------------- */
 
   .identity { gap: 0; }
@@ -1492,5 +1544,7 @@
     }
     .footer__inner > p:first-child { grid-column: 1; grid-row: 1; }
     .footer__inner > p:not(:first-child) { grid-column: 2; }
+  }
+
   }
 }

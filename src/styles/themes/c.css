@@ -1,0 +1,800 @@
+/*
+ * Theme C — "Instrument". Computational.
+ *
+ * Everything here is scoped to `:root[data-theme='c']` and declared inside the
+ * layers `base.css` already ordered, so this file extends the one cascade
+ * rather than competing with it. Colour, type and spacing are not here: those
+ * are tokens, generated from `ThemeSpec` by `Tokens.astro`.
+ *
+ * The design in one paragraph: the site is an instrument the lab keeps, not a
+ * brochure about it. Source Code Pro carries the identifiers — the menu, dates,
+ * DOIs, the ORCID iD, file paths, the commit line — and IBM Plex Sans carries
+ * everything that is a sentence; the palette is a cool near-monochrome with one
+ * accent lifted out of viridis; there are no fills, no shadows, no radii and no
+ * transitions; and hierarchy comes from weight, case and three colours of
+ * hairline rather than from size, because the type scale here is the narrowest
+ * of the three on purpose.
+ *
+ * Three things stop it reading as a monospace skin over the other two. The page
+ * opens on an identity panel — a portrait beside five labelled facts — which is
+ * identical on every page, where Record rearranges its grid for a home-page
+ * masthead and Feature opens on a cover. Every fact on that panel carries the
+ * name of the field it came from, which is the difference between a metadata
+ * block and a stack of loose strings. And the page says where it comes from:
+ * the file it is written in, and the commit the build was made from.
+ *
+ * Two rules this file follows and had to be corrected into:
+ *
+ * - Monospace means identifier. Not headings, not ledes, not captions, not
+ *   table prose. Setting sentences in the code face was what made an earlier
+ *   version of this design read as a skin rather than as a distinction.
+ * - Rules carry a hierarchy: `heading` opens a block, `border` closes a
+ *   heading, `hairline` separates rows inside a list. Every rule the same pale
+ *   grey made the page look unfinished rather than restrained.
+ *
+ * Deliberately not here: a mobile navigation drawer, which the skill asks for.
+ * Navigation is emitted exactly once, in BaseLayout, with no framework and no
+ * client JavaScript; a drawer would mean a second copy of the menu or a script
+ * this site does not otherwise need. The wrapped row gets 44px targets instead.
+ */
+
+@layer base {
+  :root[data-theme='c'] body {
+    /* Both faces ship a real weight range and a real italic. Never fake one. */
+    font-synthesis: none;
+  }
+
+  :root[data-theme='c'] :is(h1, h2, h3, h4) {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  /*
+    Unclassed h3s are subheadings. Sans, at body size, carrying their weight in
+    weight rather than in scale, and marked with the same filled square that
+    marks the current page in the rail - the design has one mark and uses it
+    everywhere rather than inventing a device per component.
+
+    Monospace was the first answer here and it was wrong: "Schmidt Science
+    Fellowship" is a title, not an identifier, and setting it in a code face
+    made a heading look like a variable name.
+  */
+  :root[data-theme='c'] h3:not([class]) {
+    font-size: var(--step-0);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  :root[data-theme='c'] h3:not([class])::before {
+    background: var(--color-accent);
+    block-size: 0.42em;
+    content: '';
+    display: inline-block;
+    inline-size: 0.42em;
+    margin-inline-end: 0.8ch;
+    vertical-align: 0.14em;
+  }
+
+  /* The same square again, as the bullet of an unclassed list. */
+  :root[data-theme='c'] .prose :is(ul, ol):not([class]) > li::marker {
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  :root[data-theme='c'] .prose ul:not([class]) { list-style-type: square; }
+
+  :root[data-theme='c'] a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.16em;
+  }
+
+  /*
+    The accent marks links inside prose, where it is the one word in a sentence
+    that goes somewhere. In a list of papers, people or repositories every entry
+    is a link, so colouring them all says nothing: those take the text colour
+    with a hairline underline and turn accent under the cursor.
+  */
+  :root[data-theme='c'] :is(.person__name, .pub__title, .card__title) a {
+    color: var(--color-heading);
+    text-decoration-color: var(--color-border);
+  }
+  :root[data-theme='c'] :is(.person__name, .pub__title, .card__title) a:hover {
+    text-decoration-color: var(--color-accent);
+  }
+
+  :root[data-theme='c'] hr {
+    border-block-start: 1px solid var(--color-hairline);
+    margin-block: var(--space-m);
+  }
+}
+
+@layer layout {
+  /*
+    An identity panel across the top, a narrow index down the left, content
+    beside it.
+
+    The panel is the same on every page, including the home page: this design
+    never rearranges itself, where Record spends its home page on a masthead
+    and Feature on a cover. It reads as the label on a piece of equipment -
+    who this is, what they are, and the numbers you would quote to cite them -
+    and it is the first thing on the page because it is the thing every other
+    page of the site is published under.
+
+    The page is held to 74rem rather than the shared 78, and the rail to 11:
+    prose keeps the 70ch measure, so a column much wider than that leaves a
+    band of paper the section rules point into and nothing fills.
+  */
+  :root[data-theme='c'] .page {
+    --c-rail: 11rem;
+    column-gap: var(--space-l);
+    max-inline-size: 74rem;
+    row-gap: var(--space-s);
+  }
+
+  /*
+    No in-page index. That is Record's device and it needs a column of its own;
+    this design has a narrow rail with the menu in it and nowhere to put a
+    second list. The slot is hidden, and the arrangement without it is repeated
+    for the pages that fill it so that hiding it opens no empty row.
+  */
+  :root[data-theme='c'] .rail { display: none; }
+  :root[data-theme='c'] .page,
+  :root[data-theme='c'] .page:has(> .rail) {
+    grid-template-areas: 'identity' 'nav' 'main';
+  }
+  :root[data-theme='c'] .page > main { margin-block-start: var(--space-s); }
+
+  /*
+    48rem, where Record's module waits until 62.
+
+    Both designs stack to identity, then menu, then prose below their own
+    breakpoint, and between 48 and 62rem that was the only shape either had -
+    so on a tablet the two were separated by type and colour alone and the
+    layout axis the brief gave them stopped doing any work. This design is the
+    one that can afford the earlier line: its rail is 11rem against Record's
+    14, its scale is the narrowest of the three, and its panel is already a
+    band across the top at this width.
+  */
+  @media (min-width: 48rem) {
+    /*
+      `auto 1fr`: the content column spans the second row on its own, and the
+      menu sits at the top of it. Two auto rows would share the content's
+      height between them and push the menu halfway down a long page.
+    */
+    :root[data-theme='c'] .page,
+    :root[data-theme='c'] .page:has(> .rail) {
+      align-items: start;
+      grid-template-columns: var(--c-rail) minmax(0, 1fr);
+      grid-template-areas: 'identity identity' 'nav main';
+      grid-template-rows: auto 1fr;
+    }
+    :root[data-theme='c'] .site-nav { flex-direction: column; gap: 0; }
+    :root[data-theme='c'] .page > main { margin-block-start: 0; }
+  }
+}
+
+@layer components {
+  /* ---- The identity panel ---------------------------------------------- */
+
+  /*
+    Portrait, then the type beside it. The panel is a plate: a photograph at a
+    fixed size on the left, and to the right the lab, the person and the five
+    facts you would need to cite them, each labelled with the field it came
+    from. Record hangs its one portrait off the right of a masthead on the home
+    page only; this one is on the left, on every page, at the same size, and it
+    is the first thing on the page rather than the last thing in a header.
+  */
+  /*
+    Stacked on a phone: beside 5.5rem of photograph there is not enough width
+    left for a labelled value, and a column sized to hold the credit is a
+    column wider than the screen.
+  */
+  :root[data-theme='c'] .identity {
+    border-block-end: 1px solid var(--color-heading);
+    display: grid;
+    gap: 0 var(--space-l);
+    grid-template-areas: 'photo' 'lab' 'name' 'meta' 'social';
+    grid-template-columns: minmax(0, 1fr);
+    padding-block-end: var(--space-s);
+  }
+
+  @media (min-width: 34rem) {
+    :root[data-theme='c'] .identity {
+      grid-template-areas:
+        'photo lab'
+        'photo name'
+        'photo meta'
+        'photo social';
+      grid-template-columns: 8rem minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    /*
+      The plate sits in the same column the menu sits in below it, at the same
+      width and the same gutter, so the panel's text and the page's content
+      share one left edge all the way down.
+    */
+    :root[data-theme='c'] .identity { grid-template-columns: var(--c-rail) minmax(0, 1fr); }
+  }
+
+  :root[data-theme='c'] .identity__photo {
+    border: 1px solid var(--color-border);
+    grid-area: photo;
+    inline-size: 5.5rem;
+    /* Stacked, the plate needs a gap under it; beside the type the column
+       gutter is already the gap. */
+    margin-block-end: var(--space-2xs);
+    max-inline-size: none;
+  }
+  @media (min-width: 34rem) {
+    :root[data-theme='c'] .identity__photo { margin-block-end: 0; }
+  }
+
+  :root[data-theme='c'] .identity__lab {
+    color: var(--color-heading);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 600;
+    grid-area: lab;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  :root[data-theme='c'] .identity__name {
+    font-size: var(--step-1);
+    font-weight: 600;
+    grid-area: name;
+    line-height: 1.2;
+    margin-block-start: var(--space-3xs);
+  }
+
+  /*
+    A keyed block, not a stack of loose strings.
+
+    Every line is `key  value` on one grid, so the keys align down a column of
+    their own and a value that runs on wraps under itself rather than under the
+    key. Without that these were four unlabelled phrases in a code face - the
+    single thing that made this design look accidental rather than exact.
+  */
+  :root[data-theme='c'] .identity__meta {
+    border-block-start: 1px solid var(--color-hairline);
+    grid-area: meta;
+    line-height: 1.4;
+    margin-block-start: var(--space-2xs);
+    padding-block-start: var(--space-2xs);
+  }
+  /*
+    The three affiliation lines are wrapped in an element of their own, because
+    the other two designs centre them as one block under a rule. Here they are
+    three rows of the same keyed grid as the line above them, so the wrapper
+    stands aside rather than being unwrapped in the markup - which would cost
+    the other two designs the thing they wrap it for.
+  */
+  :root[data-theme='c'] .identity__address { display: contents; }
+  :root[data-theme='c'] .identity__meta p {
+    column-gap: 1ch;
+    display: grid;
+    grid-template-columns: 5ch minmax(0, 1fr);
+  }
+  :root[data-theme='c'] .identity__key {
+    color: var(--color-muted);
+    display: block;
+    font-family: var(--font-mono);
+    /* The keys are the first thing scanned past, so they give way to the
+       values in size rather than competing with them in weight. */
+    font-size: 0.85em;
+    line-height: 1.65;
+    text-align: end;
+  }
+  :root[data-theme='c'] .identity__meta p:first-child { color: var(--color-text); }
+  /* An identifier, so it is set as one - and it is the one number in the panel. */
+  :root[data-theme='c'] .identity__id {
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :root[data-theme='c'] .identity .social {
+    align-self: start;
+    font-family: var(--font-mono);
+    gap: 0 var(--space-m);
+    grid-area: social;
+    margin-block-start: var(--space-2xs);
+  }
+  /* Comfortable under a thumb without adding a visible row of padding. */
+  :root[data-theme='c'] .identity .social a { display: inline-block; padding-block: var(--space-2xs); }
+
+  @media (min-width: 48rem) {
+    /*
+      Two columns of facts once there is room, so the panel is a band across the
+      top rather than a tall block pushing the page down. Row-major, so the
+      pairs read across in the order they are written.
+    */
+    :root[data-theme='c'] .identity__meta {
+      column-gap: var(--space-l);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- Navigation ------------------------------------------------------ */
+
+  /*
+    No rule above the menu: the identity panel closes with one directly over it,
+    and two hairlines a line apart is a mistake rather than a device.
+  */
+  :root[data-theme='c'] .site-nav {
+    border-block-end: 1px solid var(--color-border);
+    column-gap: var(--space-m);
+    row-gap: 0;
+  }
+
+  :root[data-theme='c'] .nav a {
+    align-items: center;
+    border-block-end: 0;
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    /* A thumb-sized target on a phone, where the menu is a wrapped row. */
+    min-block-size: 2.75rem;
+    padding-block: 0;
+    /* One character cell held open on every item, so the labels stay aligned
+       whether or not the item is the one carrying the cursor. */
+    padding-inline-start: 1.6ch;
+    position: relative;
+  }
+
+  /*
+    The current page is marked with a filled block in the reserved cell — a
+    cursor, not a rule and not an underline. It is drawn rather than written,
+    so there is no stray ">" for a screen reader to read out on top of the
+    `aria-current` the link already carries.
+  */
+  :root[data-theme='c'] .nav a[aria-current='page']::before {
+    background: var(--color-accent);
+    block-size: 0.5em;
+    content: '';
+    inline-size: 0.5em;
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+    position: absolute;
+    translate: 0 -50%;
+  }
+  :root[data-theme='c'] .nav a[aria-current='page'] {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  :root[data-theme='c'] .nav a:hover {
+    border-block-end-color: transparent;
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  @media (min-width: 48rem) {
+    /* In the rail the menu is a ruled index, tightened past thumb size. */
+    :root[data-theme='c'] .site-nav { border-block-end: 0; }
+    :root[data-theme='c'] .nav a {
+      border-block-end: 1px solid var(--color-hairline);
+      inline-size: 100%;
+      min-block-size: 0;
+      padding-block: var(--space-3xs);
+    }
+  }
+
+  /* ---- Headings: the rule runs on past the words ----------------------- */
+
+  /*
+    A heading here is a labelled divider: the words, then a hairline filling
+    whatever is left of the column. Record rules above its headings and Feature
+    does not rule them at all; this is the technical-document version, where the
+    rule is a continuation of the label rather than a frame around it.
+
+    Unclassed only. The funding strip and the in-page index bring their own
+    treatment and are left alone.
+
+    `.themed > section` is spelled out beside `section` in each of these
+    groups. The wrapper is `display: contents`, so a section this design
+    supplies for itself sits in the same place on the page as one every design
+    shares - but not in the same place in a selector, and a heading that missed
+    the rule was the only one on the site without it.
+  */
+  :root[data-theme='c'] :is(main, .manual) > h1,
+  :root[data-theme='c'] :is(main, .manual) > h2:not([class]),
+  :root[data-theme='c'] :is(main, .manual) > section > h2:not([class]),
+  :root[data-theme='c'] :is(main, .manual) > .themed > section > h2:not([class]) {
+    align-items: center;
+    column-gap: var(--space-s);
+    display: grid;
+    grid-template-columns: auto minmax(var(--space-l), 1fr);
+    max-inline-size: none;
+  }
+  /*
+    Three rule colours at one width, and this is where the hierarchy starts: the
+    page title's rule is ink, a section's is mid grey, and the rules inside a
+    list are pale. Every rule the same grey was what made the page read as
+    unfinished - there was nothing on it dark enough to hold it down.
+  */
+  :root[data-theme='c'] :is(main, .manual) > h1::after {
+    border-block-start: 1px solid var(--color-heading);
+    content: '';
+  }
+  :root[data-theme='c'] :is(main, .manual) > h2:not([class])::after,
+  :root[data-theme='c'] :is(main, .manual) > section > h2:not([class])::after,
+  :root[data-theme='c'] :is(main, .manual) > .themed > section > h2:not([class])::after {
+    border-block-start: 1px solid var(--color-border);
+    content: '';
+  }
+  :root[data-theme='c'] :is(main, .manual) > h2:not([class]),
+  :root[data-theme='c'] :is(main, .manual) > section > h2:not([class]),
+  :root[data-theme='c'] :is(main, .manual) > .themed > section > h2:not([class]) {
+    margin-block-start: var(--space-m);
+  }
+  :root[data-theme='c'] .manual > section { margin-block-start: var(--space-l); }
+
+  /* ---- Publications: citation rows, cited by identifier ---------------- */
+
+  :root[data-theme='c'] .pubs {
+    border-block-start: 1px solid var(--color-border);
+    gap: 0;
+    max-inline-size: none;
+  }
+  :root[data-theme='c'] .pub {
+    border-block-end: 1px solid var(--color-hairline);
+    gap: 0;
+    padding-block: var(--space-2xs);
+  }
+  :root[data-theme='c'] .pub__title {
+    font-size: var(--step-0);
+    line-height: 1.3;
+    max-inline-size: var(--measure);
+  }
+  /*
+    Authors are people's names, so they are set in the reading face. The venue
+    and the year are a reference, so they are set in the other one. That split
+    is the rule the whole design runs on - monospace means identifier - and it
+    was being broken here, where a mono author list read as a machine dump.
+  */
+  :root[data-theme='c'] .pub__authors {
+    line-height: 1.35;
+    max-inline-size: var(--measure);
+  }
+  :root[data-theme='c'] .pub__meta {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    max-inline-size: var(--measure);
+  }
+  /*
+    The DOI, promoted out of the small print. A paper is addressed by its
+    identifier here, the way a repository is addressed by its URL and a genome
+    by its accession — that is the dialect, and it is what makes this list a
+    record you can resolve rather than one you have to search.
+  */
+  :root[data-theme='c'] .pub__doi {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 48rem) {
+    :root[data-theme='c'] .pub {
+      column-gap: var(--space-l);
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    :root[data-theme='c'] .pub > * { grid-column: 1; }
+    :root[data-theme='c'] .pub > .pub__doi {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+      text-align: end;
+    }
+  }
+
+  /* A tag is a label, and a label on an instrument is outlined, not filled. */
+  :root[data-theme='c'] .tag {
+    background: none;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    padding: 0 0.35em;
+  }
+
+  /* The dateline, which is an identifier and so is set in the code face. */
+  :root[data-theme='c'] .dateline {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---- Cards, read as a directory listing ------------------------------ */
+
+  /*
+    One entry per row rather than a wall of cards: the name on the left, the
+    metadata that makes it reproducible — language, DOI, funder — set in
+    monospace on the right, ranked as a column of its own.
+  */
+  /*
+    `max-inline-size: none` on all three of these. base.css holds every direct
+    <ul> child of the prose to the measure, which is right for a bulleted list
+    and wrong for a grid - and in this design it is the whole argument, because
+    the width that the prose does not take is what the data gets.
+  */
+  :root[data-theme='c'] .cards {
+    border-block-start: 1px solid var(--color-border);
+    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: none;
+  }
+  :root[data-theme='c'] .card {
+    background: none;
+    border: 0;
+    border-block-end: 1px solid var(--color-hairline);
+    border-radius: 0;
+    padding: var(--space-2xs) 0;
+  }
+  :root[data-theme='c'] .card__title { font-size: var(--step-0); }
+  :root[data-theme='c'] .card > .small.muted {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 48rem) {
+    :root[data-theme='c'] .card {
+      column-gap: var(--space-l);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+    }
+    /* Everything is prose in the first column until something says otherwise. */
+    :root[data-theme='c'] .card > * { grid-column: 1; }
+    :root[data-theme='c'] .card > .small.muted {
+      align-self: start;
+      grid-column: 2;
+      /*
+        Down the rows rather than across one. Held to row 1, a metadata column
+        that wraps - a DOI is thirty characters and the column is sixteen
+        rems - made row 1 as tall as itself and pushed the summary a line and a
+        half clear of the title it belongs to, so entries with a DOI sat looser
+        than entries without one. Spanning lets it start beside the title and
+        run past it without setting the height of anything.
+
+        Counted forward: `-1` resolves against the explicit grid, and this grid
+        has no explicit rows, so it would land back on row 1.
+      */
+      grid-row: 1 / span 4;
+      /* It follows a <p>, so it would otherwise take the paragraph gap and
+         drop out of line with the title it sits beside. */
+      margin-block-start: 0;
+    }
+  }
+
+  /*
+    The way out of the front page's listing and into the full one. Monospaced,
+    because it is a path rather than a sentence, and set on the hairline that
+    closes the list so it reads as the last row of it.
+  */
+  :root[data-theme='c'] .release__more {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    margin-block-start: var(--space-2xs);
+  }
+
+  /* ---- People, as a roster --------------------------------------------- */
+
+  /*
+    A ruled roster with portraits: a square plate, the name, and the person's
+    own sentence about what they work on. The rank is not repeated on the row -
+    the roster is grouped under a heading that already says it, and four rows
+    reading "PhD Student" under a heading reading "PhD Student" is a column of
+    noise. The placeholder mark stays, set as a label, because it is the one
+    fact that differs from row to row and the one this demo must not bury.
+  */
+  :root[data-theme='c'] .people__grid {
+    border-block-start: 1px solid var(--color-heading);
+    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: none;
+  }
+  :root[data-theme='c'] .person {
+    background: none;
+    border: 0;
+    border-block-end: 1px solid var(--color-hairline);
+    border-radius: 0;
+    column-gap: var(--space-s);
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    padding: var(--space-s) 0;
+    row-gap: 0;
+  }
+  :root[data-theme='c'] .person__avatar {
+    align-self: start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-0);
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    letter-spacing: 0.04em;
+  }
+  :root[data-theme='c'] .person > :not(.person__avatar) { grid-column: 2; }
+  :root[data-theme='c'] .person__name {
+    font-size: var(--step-0);
+    margin: 0;
+  }
+  /* The rank, which the section heading above already carries. */
+  :root[data-theme='c'] .person__rank { display: none; }
+  /* The placeholder mark, set as a label the way every other label here is. */
+  :root[data-theme='c'] .person__placeholder {
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    margin-block-start: var(--space-3xs);
+  }
+  :root[data-theme='c'] .person__about {
+    color: var(--color-muted);
+    margin-block-start: var(--space-2xs);
+    max-inline-size: var(--measure);
+  }
+  :root[data-theme='c'] .person__about p + p { margin-block-start: var(--space-2xs); }
+  :root[data-theme='c'] .people__summary {
+    color: var(--color-accent);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.02em;
+    padding-block: var(--space-2xs);
+    text-transform: uppercase;
+  }
+
+  /* ---- Gallery --------------------------------------------------------- */
+
+  :root[data-theme='c'] .gallery { gap: var(--space-2xs); max-inline-size: none; }
+  :root[data-theme='c'] .gallery__item {
+    background: none;
+    border: 1px solid var(--color-hairline);
+    border-radius: 0;
+    font-family: var(--font-mono);
+  }
+
+  /* ---- Long-form pages ------------------------------------------------- */
+
+  /* A summary line, ruled off the title. Prose, so it is not set in the code
+     face - the rule and the colour are enough to mark it as a summary. */
+  :root[data-theme='c'] .lede {
+    color: var(--color-text);
+    font-size: var(--step-0);
+    line-height: 1.5;
+  }
+
+  :root[data-theme='c'] .toc {
+    background: none;
+    border: 0;
+    border-block-start: 1px solid var(--color-border);
+    border-inline-start: 0;
+    padding: var(--space-2xs) 0 0;
+  }
+  :root[data-theme='c'] .toc h2 {
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+  :root[data-theme='c'] .toc ol { font-size: var(--step--1); }
+  :root[data-theme='c'] .toc li { border-block-end: 1px solid var(--color-hairline); }
+  :root[data-theme='c'] .toc li a { display: inline-block; padding-block: var(--space-2xs); }
+
+  /*
+    No `.note` override any more. The shared marker bar is `--rule-heavy`, and
+    this design declares all three rule weights as the same hairline, so it
+    already arrives at 1px.
+  */
+
+  :root[data-theme='c'] .manual details {
+    border: 0;
+    border-block: 1px solid var(--color-hairline);
+    border-radius: 0;
+    padding-inline: 0;
+  }
+  :root[data-theme='c'] .manual summary { font-weight: 600; }
+  :root[data-theme='c'] .manual code {
+    background: none;
+    border: 1px solid var(--color-hairline);
+    border-radius: 0;
+    padding: 0 0.3em;
+  }
+  /*
+    A table is the instrument's native form, so it is tightened and its figures
+    are made tabular - but the cells here hold sentences, and a paragraph in a
+    code face is harder to read for no gain.
+  */
+  :root[data-theme='c'] .manual :is(th, td) {
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+  :root[data-theme='c'] .manual :is(th, td) { border-block-end-color: var(--color-hairline); }
+  :root[data-theme='c'] .manual thead th { letter-spacing: 0.04em; }
+
+  /* ---- Where the page comes from --------------------------------------- */
+
+  :root[data-theme='c'] .source-line {
+    align-items: baseline;
+    border-block-start: 1px solid var(--color-hairline);
+    color: var(--color-muted);
+    column-gap: var(--space-s);
+    display: flex;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    margin-block-start: var(--space-l);
+    padding-block-start: var(--space-2xs);
+  }
+  :root[data-theme='c'] .source-line__edit {
+    display: inline-block;
+    margin-inline-start: auto;
+    padding-block: var(--space-3xs);
+  }
+
+  /* ---- Footer: the panel legend ---------------------------------------- */
+
+  /*
+    Flush left and stacked, tight, in one face. Record aligns its footer to the
+    page grid and Feature sets a two-column colophon; this is the block of
+    small type printed on the back of the instrument, and it is not laid out so
+    much as listed.
+  */
+  :root[data-theme='c'] .footer {
+    border-block-start: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    line-height: 1.4;
+    margin-block-start: var(--space-xl);
+    padding-block: var(--space-s);
+  }
+  :root[data-theme='c'] .footer__inner > p:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  :root[data-theme='c'] .build-line {
+    border-block-start: 1px solid var(--color-hairline);
+    display: block;
+    font-variant-numeric: tabular-nums;
+    margin-block-start: var(--space-2xs);
+    padding-block-start: var(--space-2xs);
+  }
+
+  /* ---- Demo chrome ----------------------------------------------------- */
+
+  :root[data-theme='c'] .demo-banner strong { font-family: var(--font-mono); }
+
+  /*
+    The placeholder marker, set as a boxed machine notice. It has to stay loud
+    — it is the difference between a demo and a claim about her work — so it
+    keeps the accent and gains a hairline the whole way round, which is the one
+    place in this design a box is allowed.
+  */
+  :root[data-theme='c'] .demo-note {
+    border: 1px solid var(--color-accent);
+    border-radius: 0;
+    color: var(--color-text);
+    line-height: 1.45;
+    padding: var(--space-2xs) var(--space-s);
+  }
+  :root[data-theme='c'] .demo-note strong {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  :root[data-theme='c'] .switcher { box-shadow: none; }
+  :root[data-theme='c'] .switcher__legend { font-family: var(--font-mono); }
+}
+
+@layer utilities {
+  :root[data-theme='c'] .themed[data-themes~='c'] { display: contents; }
+}

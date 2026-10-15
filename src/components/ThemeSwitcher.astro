@@ -1,0 +1,127 @@
+---
+/**
+ * The control that swaps between the three designs.
+ *
+ * Not part of any of them: it is the thing you compare them with, and the
+ * first thing a real deployment of this would delete. It swaps `data-theme` on
+ * <html> without reloading, so the content stays pinned and only the design
+ * moves - which is the whole claim the switcher exists to let someone check.
+ *
+ * Collapsible, because the panel is the one thing on screen that is not the
+ * site: open it to switch, close it to look. Shut, it names the design showing,
+ * which is all it has to say while someone is reading. Whether it is open
+ * persists too: a phone is where the panel is most in the way and also where
+ * reopening it is most annoying.
+ *
+ * The design names and one-line descriptions stay in English in every locale.
+ * They are the author's notes on three design directions rather than content
+ * of the site, and "Record" is a name. The two chrome labels are translated,
+ * because those are words the control says to the reader in their own voice.
+ */
+import { THEMES, DEFAULT_THEME } from '../lib/themes.ts';
+import { DEFAULT_LOCALE, t, type Locale } from '../lib/i18n.ts';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = DEFAULT_LOCALE } = Astro.props;
+const s = t(locale);
+
+const fallback = THEMES.find((theme) => theme.id === DEFAULT_THEME) ?? THEMES[0]!;
+---
+<aside class="switcher" aria-label={s('designPreviewLabel')}>
+  <details class="switcher__panel" open>
+    <summary class="switcher__summary">
+      <span class="switcher__legend">{s('previewDesign')}</span>
+      {/* One line each: a break before an expression would eat the space. */}
+      <span class="switcher__current"><span class="switcher__name">{fallback.name}</span><span class="switcher__short">{fallback.shortName}</span></span>
+    </summary>
+
+    {/*
+      A fieldset, which is the native grouping for a set of radios and needs no
+      ARIA to say so. One `name` across all three, so the browser and a screen
+      reader both read them as one choice.
+    */}
+    <div class="switcher__body">
+      <fieldset class="switcher__set">
+        <legend class="switcher__group">{s('theThreeDesigns')}</legend>
+        <div class="switcher__options">
+          {THEMES.map((theme) => (
+            <label class="switcher__option">
+              <input type="radio" name="theme" value={theme.id} />
+              <span class="switcher__text">
+                <span class="switcher__name">{theme.name}</span>
+                <span class="switcher__short">{theme.shortName}</span>
+                <span class="switcher__desc">{theme.description}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </div>
+  </details>
+</aside>
+
+<script is:inline define:vars={{ fallback: DEFAULT_THEME }}>
+  // The <head> script has already applied the stored design; this only syncs
+  // the control and writes changes back.
+  const root = document.documentElement;
+  const panel = document.querySelector('.switcher__panel');
+  const current = root.dataset.theme || fallback;
+
+  // The name shown while the panel is shut, copied off the checked radio's own
+  // label rather than kept in a second list that could drift from it. Both the
+  // long and the short name, because which of the two is showing is a question
+  // for the stylesheet and the width of the screen, not for this.
+  const target = document.querySelector('.switcher__current');
+  const showCurrent = (input) => {
+    if (!target) return;
+    for (const part of ['.switcher__name', '.switcher__short']) {
+      const to = target.querySelector(part);
+      const from = input.parentElement.querySelector(`.switcher__text ${part}`);
+      if (to && from) to.textContent = from.textContent;
+    }
+  };
+
+  for (const input of document.querySelectorAll('input[name="theme"]')) {
+    input.checked = input.value === current;
+    if (input.checked) showCurrent(input);
+    input.addEventListener('change', () => {
+      root.dataset.theme = input.value;
+      showCurrent(input);
+      try {
+        localStorage.setItem('demo-theme', input.value);
+      } catch {
+        // Private browsing or blocked site data: the switch still works for
+        // this page view, it just will not be remembered.
+      }
+    });
+  }
+
+  if (panel) {
+    /*
+      Open on a screen with room for it, shut on one without, and whatever was
+      last chosen beats both. Run inline where the panel is parsed rather than
+      on load, so a panel that should be shut is never painted open.
+
+      62rem, not the 34 the panel narrows at: a fixed overlay this tall is a
+      quarter of a tablet, and `check:responsive` fails a switcher that covers
+      that much of a page it is not the subject of.
+    */
+    let stored = null;
+    try {
+      stored = localStorage.getItem('demo-switcher');
+    } catch {
+      // Same as above: no memory, but a working control.
+    }
+    panel.open = stored === null ? matchMedia('(min-width: 62rem)').matches : stored === 'open';
+
+    panel.addEventListener('toggle', () => {
+      try {
+        localStorage.setItem('demo-switcher', panel.open ? 'open' : 'shut');
+      } catch {
+        // Ditto.
+      }
+    });
+  }
+</script>

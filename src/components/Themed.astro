@@ -1,0 +1,30 @@
+---
+/**
+ * Markup that belongs to some designs and not others.
+ *
+ * The switcher swaps `data-theme` on <html> without reloading, so a variant
+ * cannot be chosen at build time: every variant ships in the page, and each
+ * design's stylesheet hides the ones that are not its own. `display: none`
+ * takes the hidden ones out of the accessibility tree as well as off the
+ * screen, so a screen reader hears one version, not three.
+ *
+ * The wrapper itself is `display: contents`, so it disappears from layout and
+ * its children sit directly in whatever grid or flex context surrounds it.
+ *
+ * Never wrap navigation, the identity block or <main> in this. Those are
+ * landmarks, and a second copy of one is a bug even while it is hidden;
+ * test/single-emission.test.ts enforces that they are emitted once.
+ *
+ * Because the content is emitted whether or not it is showing, this is for
+ * variants of a thing, not for bulk: three copies of the publication list is
+ * three copies in the HTML. Where a difference can be made with CSS over one
+ * piece of markup, make it with CSS.
+ */
+interface Props {
+  /** Theme ids this content belongs to, e.g. `"a"` or `['a', 'c']`. */
+  themes: string | string[];
+}
+const { themes } = Astro.props;
+const ids = (Array.isArray(themes) ? themes : [themes]).join(' ');
+---
+<div class="themed" data-themes={ids}><slot /></div>

@@ -1,41 +1,58 @@
 ---
 /**
- * Emits the design tokens as custom properties on `:root`.
+ * Emits each design's tokens as custom properties, scoped by `data-theme`.
  *
  * The type and space scales are fluid, interpolated across the viewport range
- * by `lib/utopia.ts`, so this is generated rather than written by hand: the
- * scale is a formula and its steps are its output.
+ * by `lib/utopia.ts`, so this is generated rather than written by hand: a scale
+ * is a formula and its steps are its output. Three designs means three full
+ * token sets, because the designs differ in the scales themselves and not only
+ * in their colours - Feature's large end runs about six times its body size
+ * where Record's runs three, and that is a property of the formula.
  *
- * `color-scheme: light` is declared here rather than left to the browser. The
- * site has one palette, and letting the browser force a mode it was never
- * drawn in would repaint form controls and scrollbars to match a dark page
- * that does not exist.
+ * The default block is written twice, once on bare `:root` and once on
+ * `:root[data-theme='a']`. The bare one is what a reader gets before any
+ * script runs and if none ever does; the attribute one exists so that switching
+ * back to Record is a change of attribute like any other rather than removing
+ * it. They are the same tokens, from the same spec, so they cannot disagree.
+ *
+ * `color-scheme: light` is declared once on `:root`. No design here has a dark
+ * palette, and letting the browser force a mode none of them was drawn in would
+ * repaint form controls and scrollbars to match a dark page that does not exist.
  */
 import { typeScale, spaceScale, tokensToCss } from '../lib/utopia.ts';
-import { DESIGN, VIEWPORT, TYPE_STEPS, SPACE_STEPS, FONT_STACKS } from '../lib/design.ts';
+import { VIEWPORT, TYPE_STEPS, SPACE_STEPS, FONT_STACKS } from '../lib/design.ts';
+import { THEMES, DEFAULT_THEME, type ThemeSpec } from '../lib/themes.ts';
 
-const fluidTokens = {
-  ...typeScale({ ...VIEWPORT, ...DESIGN.type, steps: TYPE_STEPS }),
-  ...spaceScale({ ...VIEWPORT, ...DESIGN.space, steps: SPACE_STEPS }),
-};
-const staticTokens: Record<string, string> = {
-  'font-display': DESIGN.fonts.display,
-  'font-body': DESIGN.fonts.body,
-  // Monospace has no job here beyond `<code>`, so it keeps the system stack
-  // rather than shipping a face for one element.
-  'font-mono': DESIGN.fonts.mono ?? FONT_STACKS.mono,
-  radius: DESIGN.shape.radius,
-  rule: DESIGN.shape.rule,
-  'rule-strong': DESIGN.shape.ruleStrong,
-  'rule-heavy': DESIGN.shape.ruleHeavy,
-  measure: DESIGN.shape.measure,
-  'measure-wide': DESIGN.shape.measureWide,
-  'page-max': DESIGN.shape.pageMax,
-  ...Object.fromEntries(
-    Object.entries(DESIGN.colors).map(([name, value]) => [`color-${name}`, value]),
+function tokensFor(theme: ThemeSpec): Record<string, string> {
+  return {
+    ...typeScale({ ...VIEWPORT, ...theme.type, steps: TYPE_STEPS }),
+    ...spaceScale({ ...VIEWPORT, ...theme.space, steps: SPACE_STEPS }),
+    'font-display': theme.fonts.display,
+    'font-body': theme.fonts.body,
+    // A design that gives monospace no job beyond `<code>` says nothing and
+    // keeps the system stack, rather than shipping a face for one element.
+    'font-mono': theme.fonts.mono ?? FONT_STACKS.mono,
+    radius: theme.shape.radius,
+    rule: theme.shape.rule,
+    'rule-strong': theme.shape.ruleStrong,
+    'rule-heavy': theme.shape.ruleHeavy,
+    measure: theme.shape.measure,
+    'measure-wide': theme.shape.measureWide,
+    'page-max': theme.shape.pageMax,
+    ...Object.fromEntries(
+      Object.entries(theme.colors).map(([name, value]) => [`color-${name}`, value]),
+    ),
+  };
+}
+
+const fallback = THEMES.find((theme) => theme.id === DEFAULT_THEME)!;
+
+const blocks = [
+  `:root {\n  color-scheme: light;\n${tokensToCss(tokensFor(fallback))}\n}`,
+  ...THEMES.map(
+    (theme) => `:root[data-theme='${theme.id}'] {\n${tokensToCss(tokensFor(theme))}\n}`,
   ),
-};
-const block = `:root {\n  color-scheme: light;\n${tokensToCss({ ...fluidTokens, ...staticTokens })}\n}`;
+].join('\n');
 ---
 
-<style is:global set:html={block}></style>
+<style is:global set:html={blocks}></style>

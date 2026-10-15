@@ -1,0 +1,862 @@
+/*
+ * Theme B — "Feature". Editorial / Magazine.
+ *
+ * Everything here is scoped to `:root[data-theme='b']` and declared inside the
+ * layers `base.css` already ordered, so this file extends the one cascade
+ * rather than competing with it. Colour, type and spacing are not here: those
+ * are tokens, generated from `ThemeSpec` by `Tokens.astro`.
+ *
+ * The design in one paragraph: Fraunces over Instrument Sans on a warm
+ * off-white, with her lavender kept; a content grid whose text column sits off
+ * the left edge and leaves a wide margin, so a published figure can break out
+ * of the column the prose is set in; and a home page that opens on a question
+ * rather than on a summary. Colour is editorial — a kicker, a link, a
+ * numeral — and never a fill.
+ *
+ * Two things stop it reading as a template with a serif bolted on. The
+ * imagery is real figures from real papers, each carrying its citation, its
+ * licence and its placeholder mark in the caption, which is a job rather than
+ * decoration. And the publication list is not one list: a selected paper gets
+ * its annotation set beside it in the margin, at the size of something worth
+ * reading, while the full record stays a plain index below.
+ *
+ * Deliberately not here: a portrait in the masthead. This design's images are
+ * its figures, and Record already spends its one image on a face. Sophie still
+ * appears on the team page, which is where a magazine puts its contributors.
+ */
+
+@layer base {
+  :root[data-theme='b'] body {
+    /*
+      Both faces ship real italics and a real weight range, so nothing here
+      should ever be synthesised. `font-optical-sizing: auto` is the whole of
+      the Fraunces opsz wiring: a 110px cover line and a 13px caption come off
+      the same file drawn for the size each is set at, with no
+      `font-variation-settings` anywhere.
+    */
+    font-optical-sizing: auto;
+    font-synthesis: none;
+  }
+
+  :root[data-theme='b'] :is(h1, h2, h3, h4) {
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+  }
+
+  /*
+    A serif subhead reads as a subhead in italic; it does not need capitals.
+    Unclassed only: `.person__name` and the other classed h3s are people's
+    names and paper titles, and italicising those says something about them
+    that is not true.
+  */
+  :root[data-theme='b'] h3:not([class]) {
+    font-size: var(--step-1);
+    font-style: italic;
+  }
+
+  :root[data-theme='b'] a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  /*
+    The accent belongs to links inside prose, where it marks the one word in a
+    sentence that goes somewhere. In a list of papers, people or projects every
+    entry is a link, so colouring them all says nothing: those are set in the
+    display face at heading colour and turn lavender under the cursor.
+  */
+  :root[data-theme='b'] :is(.person__name, .pub__title, .card__title) a {
+    color: var(--color-heading);
+    text-decoration-color: var(--color-border);
+  }
+  :root[data-theme='b'] :is(.person__name, .pub__title, .card__title) a:hover {
+    text-decoration-color: var(--color-accent);
+  }
+
+  :root[data-theme='b'] hr {
+    border-block-start: 1px solid var(--color-border);
+    margin-block: var(--space-xl);
+  }
+}
+
+@layer layout {
+  /*
+    No rail. The in-page index is Record's device and it needs a third column
+    to live in; this design has no sidebar to put one beside, so the slot is
+    hidden and the arrangement without it is repeated for the pages that fill
+    it, which stops an empty row opening up.
+  */
+  :root[data-theme='b'] .rail { display: none; }
+  :root[data-theme='b'] .page,
+  :root[data-theme='b'] .page:has(> .rail) {
+    grid-template-areas: 'identity' 'nav' 'main';
+    row-gap: var(--space-2xs);
+  }
+
+  /*
+    The content grid.
+
+    Four lines, three tracks: an indent, the column the prose is set in, and a
+    margin. Every child of <main> lands in the middle track by default, so the
+    text block sits off the left edge with room to its right — and the things
+    that are not prose take the lines they need. A figure spans `full` and
+    breaks out on both sides; a section spans from the text column into the
+    margin, so a list inside it can put an annotation where the prose cannot
+    go. That is the whole asymmetry, and it is four grid lines rather than a
+    stack of negative margins.
+
+    On a phone the outer tracks are zero, which collapses this to the single
+    column everything is written for first.
+  */
+  :root[data-theme='b'] .page > main {
+    align-content: start;
+    display: grid;
+    grid-template-columns:
+      [full-start] 0
+      [text-start] minmax(0, 1fr)
+      [text-end] 0
+      [full-end];
+    margin-block-start: var(--space-l);
+  }
+
+  /*
+    `.themed` is `display: contents`, so its children are the grid items here
+    and the wrapper itself never takes a track. It is named in both selectors
+    for the same reason: a rule that only matched `main > *` would miss every
+    variant this design supplies.
+  */
+  :root[data-theme='b'] .page > main > *,
+  :root[data-theme='b'] .page > main > .themed > * {
+    grid-column: text;
+  }
+
+  /*
+    A section reaches into the margin; the prose inside it still keeps the
+    measure. So do the lists that are grids rather than prose — a card wall
+    held to the reading column has columns narrow enough to break a word like
+    "environmental" across two lines.
+  */
+  :root[data-theme='b'] .page > main > section,
+  :root[data-theme='b'] .page > main > .themed > section,
+  :root[data-theme='b'] .page > main > :is(.cards, .people__grid, .gallery, .pubs) {
+    grid-column: text-start / full-end;
+  }
+  :root[data-theme='b'] .page > main > .themed > :is(.cover, .questions) {
+    grid-column: full;
+  }
+
+  /* A page title is display type, so it is not held to the reading measure. */
+  :root[data-theme='b'] .page > main > h1 {
+    grid-column: text-start / full-end;
+    max-inline-size: none;
+  }
+
+  :root[data-theme='b'] .page > main > h2 {
+    margin-block-start: var(--space-xl);
+  }
+  /*
+    One gap between sections, not two. <main> is a grid here, so a grid item's
+    margin does not collapse with its first child's the way it would in normal
+    flow: the section's own space and its heading's space were both spent, and
+    a rank on the team page arrived 165px below the one above it. Generous is
+    this design's argument - it carries the widest space scale of the three on
+    purpose - but a screen of nothing between a note and a heading reads as
+    unfinished rather than as generous. The section keeps the space and the
+    heading that opens it gives its own back.
+  */
+  :root[data-theme='b'] .page > main > section {
+    margin-block-start: var(--space-xl);
+  }
+  :root[data-theme='b'] .page > main > section > :is(h2, h3):first-child {
+    margin-block-start: 0;
+  }
+
+  @media (min-width: 62rem) {
+    :root[data-theme='b'] .page > main {
+      grid-template-columns:
+        [full-start] minmax(0, 6rem)
+        [text-start] minmax(0, 40rem)
+        [text-end] minmax(0, 1fr)
+        [full-end];
+    }
+  }
+}
+
+@layer components {
+  /* ---- Masthead --------------------------------------------------------- */
+
+  :root[data-theme='b'] .identity {
+    /* A printed double rule, which is one border rather than two elements. */
+    border-block-end: var(--rule-heavy) double var(--color-heading);
+    gap: var(--space-3xs);
+    padding-block-end: var(--space-2xs);
+  }
+
+  :root[data-theme='b'] .identity__lab {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  :root[data-theme='b'] .identity__name {
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 600;
+  }
+
+  :root[data-theme='b'] .identity__meta p { line-height: 1.35; }
+
+  /*
+    The portrait is not part of this masthead — see the note at the top of the
+    file. Hidden rather than removed, because the markup is shared and Record
+    and Instrument both want it.
+  */
+  :root[data-theme='b'] .identity__photo { display: none; }
+
+  :root[data-theme='b'] .identity .social a { font-weight: 500; }
+
+  /*
+    Inner pages get the running head: one line, wrapping when it has to, with
+    the links pushed to the far end. Only the discipline is carried — the job
+    title, department and institution are all printed in the footer, and
+    repeating the full taxonomy at the top of every page is the habit this
+    design is arguing against.
+  */
+  :root[data-theme='b'] .page:not(:has(h1.identity__name)) .identity {
+    align-items: baseline;
+    column-gap: var(--space-s);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    row-gap: var(--space-3xs);
+  }
+  :root[data-theme='b'] .page:not(:has(h1.identity__name)) .identity__meta p + p {
+    display: none;
+  }
+  :root[data-theme='b'] .page:not(:has(h1.identity__name)) .identity .social {
+    margin-inline-start: auto;
+  }
+
+  /* The cover flag: the lab's name at the size the page is named by. */
+  :root[data-theme='b'] .page:has(h1.identity__name) .identity__lab {
+    font-size: var(--step-4);
+  }
+  :root[data-theme='b'] .page:has(h1.identity__name) .identity__name {
+    font-size: var(--step-1);
+  }
+
+  @media (min-width: 48rem) {
+    /*
+      Home: the flag takes the whole first row, then the byline sits under the
+      rule with the links at the opposite end of it. The taxonomy is set inline
+      and separated by hairlines rather than by punctuation, so nothing is
+      added to the text for a screen reader to read out.
+    */
+    :root[data-theme='b'] .page:has(h1.identity__name) .identity {
+      column-gap: var(--space-m);
+      display: grid;
+      grid-template-areas:
+        'lab  lab'
+        'name social'
+        'meta social';
+      grid-template-columns: minmax(0, 1fr) auto;
+      row-gap: var(--space-3xs);
+    }
+    :root[data-theme='b'] .page:has(h1.identity__name) .identity__lab { grid-area: lab; }
+    :root[data-theme='b'] .page:has(h1.identity__name) .identity__name { grid-area: name; }
+    :root[data-theme='b'] .page:has(h1.identity__name) .identity__meta { grid-area: meta; }
+    :root[data-theme='b'] .page:has(h1.identity__name) .identity .social {
+      align-self: end;
+      grid-area: social;
+      justify-self: end;
+    }
+
+    :root[data-theme='b'] .identity__meta {
+      column-gap: var(--space-2xs);
+      display: flex;
+      flex-wrap: wrap;
+    }
+    :root[data-theme='b'] .identity__meta p + p {
+      border-inline-start: 1px solid var(--color-border);
+      padding-inline-start: var(--space-2xs);
+    }
+  }
+
+  /* ---- Running head ------------------------------------------------------ */
+
+  :root[data-theme='b'] .site-nav {
+    border-block-end: 1px solid var(--color-border);
+    column-gap: var(--space-m);
+    padding-block-end: var(--space-3xs);
+  }
+  :root[data-theme='b'] .nav a {
+    border-block-end: 0;
+    color: var(--color-text);
+    font-size: var(--step--1);
+    font-weight: 500;
+    /* Comfortable under a thumb: the row wraps on a phone and is tapped there. */
+    padding-block: var(--space-xs);
+  }
+  :root[data-theme='b'] .nav a:hover {
+    border-block-end-color: transparent;
+    color: var(--color-accent);
+  }
+  :root[data-theme='b'] .nav a[aria-current='page'] {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+
+  /* ---- The cover --------------------------------------------------------- */
+
+  :root[data-theme='b'] .cover { margin-block-end: var(--space-xl); }
+
+  /* A kicker in italic serif, closed by a short rule the width of the words. */
+  :root[data-theme='b'] .cover__kicker {
+    border-block-end: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-style: italic;
+    inline-size: fit-content;
+    padding-block-end: var(--space-3xs);
+  }
+
+  :root[data-theme='b'] .cover__question {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    /*
+      Step 4, not step 5. Fraunces' optical-size axis follows the rendered
+      size, so a cover line set at the top of the scale is drawn with the
+      hairlines of a 110px display cut: the crossbar of an H thins until "How"
+      reads as "Iow". A step down, at 500 rather than 400, keeps the drama and
+      keeps the word.
+    */
+    font-size: var(--step-4);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    margin-block-start: var(--space-s);
+    /* Display type is not prose, so the reading measure does not apply to it. */
+    max-inline-size: none;
+    text-wrap: balance;
+  }
+
+  :root[data-theme='b'] .cover .demo-note { margin-block: var(--space-m); }
+  :root[data-theme='b'] .cover .figure { margin-block-start: var(--space-m); }
+
+  /*
+    62rem, not the 48 the rest of this design splits at, and it is the same
+    line the content grid's margin track opens on. Three of twelve columns is
+    a note four or five words to the line on a tablet - the caption slot for a
+    figure that carries its own citation, set narrower than the citation can be
+    read at. Below this width the note stays a paragraph above the figure and
+    the figure takes the full column.
+  */
+  @media (min-width: 62rem) {
+    /*
+      Twelve columns, used unevenly on purpose: the question stops three
+      columns short of the right edge so its ragged edge is visible as a
+      choice, the note sits under its own first three, and the figure takes the
+      remaining nine.
+    */
+    :root[data-theme='b'] .cover {
+      column-gap: var(--space-m);
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    :root[data-theme='b'] .cover__kicker { grid-column: 1 / -1; }
+    :root[data-theme='b'] .cover__question { grid-column: 1 / 10; }
+    :root[data-theme='b'] .cover .demo-note {
+      align-self: start;
+      grid-column: 1 / 4;
+      margin-block-end: 0;
+    }
+    :root[data-theme='b'] .cover .figure { grid-column: 4 / -1; margin-block-start: var(--space-m); }
+  }
+
+  /* ---- Figures: the motif ------------------------------------------------ */
+
+  /*
+    A figure is mounted rather than framed: the image keeps its own white
+    ground and sits on a lavender mat, which is what stops a paper figure
+    reading as a screenshot dropped onto the page.
+  */
+  :root[data-theme='b'] .figure__image {
+    background: var(--color-wash);
+    border: 1px solid var(--color-border);
+    inline-size: 100%;
+    padding: var(--space-2xs);
+  }
+
+  :root[data-theme='b'] .figure__caption {
+    border-block-start: 1px solid var(--color-heading);
+    color: var(--color-muted);
+    font-size: var(--step--1);
+    line-height: 1.45;
+    margin-block-start: var(--space-2xs);
+    padding-block-start: var(--space-2xs);
+  }
+  :root[data-theme='b'] .figure__label {
+    color: var(--color-accent);
+    font-weight: 600;
+    /* The gap is set here rather than left to the whitespace between two
+       spans, which Astro collapses away when the second one starts a line. */
+    margin-inline-end: 0.4em;
+  }
+  :root[data-theme='b'] .figure__what { color: var(--color-text); }
+  :root[data-theme='b'] .figure__credit {
+    display: block;
+    margin-block-start: var(--space-2xs);
+  }
+  :root[data-theme='b'] .figure__citation {
+    display: block;
+    font-style: italic;
+  }
+  :root[data-theme='b'] .figure__placeholder {
+    color: var(--color-accent);
+    display: block;
+    margin-block-start: var(--space-3xs);
+  }
+
+  /* ---- The lede, and its drop cap --------------------------------------- */
+
+  /*
+    Only on the home page, and only on the paragraph that opens it. The
+    selector reads the same <h1> that BaseLayout's `identityIsHeading` puts in
+    the identity block, so there is no second flag to keep in step. Everywhere
+    else the first paragraph is a note or a date line, and a drop cap on one of
+    those is a mistake with a decorative excuse.
+  */
+  :root[data-theme='b'] .page:has(h1.identity__name) main > p:first-of-type {
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+  :root[data-theme='b'] .page:has(h1.identity__name) main > p:first-of-type::first-letter {
+    color: var(--color-accent);
+    float: inline-start;
+    font-family: var(--font-display);
+    font-size: 3.4em;
+    font-weight: 500;
+    line-height: 0.82;
+    padding-block-start: 0.06em;
+    padding-inline-end: 0.08em;
+  }
+
+  :root[data-theme='b'] .lede {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* ---- The contents page: themes as questions ---------------------------- */
+
+  :root[data-theme='b'] .questions { margin-block-start: var(--space-2xl); }
+  :root[data-theme='b'] .questions__heading {
+    font-size: var(--step-2);
+    margin: 0;
+  }
+  :root[data-theme='b'] .questions .demo-note { margin-block: var(--space-s); }
+  /* Stacked on a phone, and a grid of its own once there is room — see below. */
+  :root[data-theme='b'] .questions__list {
+    display: grid;
+    row-gap: var(--space-m);
+  }
+
+  :root[data-theme='b'] .question__link {
+    border-block-start: 1px solid var(--color-heading);
+    display: block;
+    padding-block-start: var(--space-2xs);
+    text-decoration: none;
+  }
+  :root[data-theme='b'] .question__kicker {
+    color: var(--color-muted);
+    display: block;
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+  :root[data-theme='b'] .question__number {
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  :root[data-theme='b'] .question__text {
+    color: var(--color-heading);
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    margin-block-start: var(--space-2xs);
+    text-wrap: balance;
+  }
+  :root[data-theme='b'] .question__link:hover .question__text {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.12em;
+  }
+  :root[data-theme='b'] .question:first-child .question__text { font-size: var(--step-2); }
+  :root[data-theme='b'] .questions .figure { margin-block-start: var(--space-m); }
+  :root[data-theme='b'] .questions .pullquote { margin-block-start: var(--space-xl); }
+
+  @media (min-width: 48rem) {
+    /*
+      A contents page: the lead entry twice the width of the two under it, and
+      the figure held in the last two columns beside all three. Placement is
+      explicit rather than auto-flowed because this block's contents are
+      written in the page, not looped over data — an unfamiliar reader can see
+      the shape here instead of deriving it from `dense` packing.
+    */
+    :root[data-theme='b'] .questions {
+      column-gap: var(--space-m);
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      row-gap: var(--space-m);
+    }
+    :root[data-theme='b'] .questions__heading { grid-area: 1 / 1 / 2 / -1; }
+    :root[data-theme='b'] .questions .demo-note { grid-area: 2 / 1 / 3 / -1; margin-block: 0; }
+    /*
+      The three entries are their own grid rather than three items in this one.
+      Placed directly, the figure's two-row span would push its height into the
+      row the lead entry sits in and open a hole under it; nested, the entries
+      pack from the top and the leftover height falls where it should, beside
+      the figure's caption.
+    */
+    :root[data-theme='b'] .questions__list {
+      align-content: start;
+      column-gap: var(--space-m);
+      grid-area: 3 / 1 / 4 / 5;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    :root[data-theme='b'] .question:first-child { grid-column: 1 / -1; }
+    :root[data-theme='b'] .questions .figure {
+      align-self: start;
+      grid-area: 3 / 5 / 5 / -1;
+      margin-block-start: 0;
+    }
+    :root[data-theme='b'] .questions .pullquote {
+      grid-area: 4 / 1 / 5 / 5;
+      margin-block-start: 0;
+    }
+    :root[data-theme='b'] .question:first-child .question__text { font-size: var(--step-3); }
+  }
+
+  /* ---- Pull quote -------------------------------------------------------- */
+
+  /*
+    Pulled from the site's own Research page rather than invented, which is
+    what a pull quote is: the words are already printed elsewhere, set large
+    because they carry the argument. No quotation marks — it is a description
+    of the work, not a line anyone said.
+  */
+  :root[data-theme='b'] .pullquote {
+    border-block: 1px solid var(--color-heading);
+    padding-block: var(--space-m);
+  }
+  :root[data-theme='b'] .pullquote__text {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.18;
+    max-inline-size: 30ch;
+    text-wrap: balance;
+  }
+  :root[data-theme='b'] .pullquote__source {
+    color: var(--color-muted);
+    font-size: var(--step--1);
+    margin-block-start: var(--space-2xs);
+  }
+
+  /* ---- Publications ------------------------------------------------------ */
+
+  /*
+    The full record is an index: ruled rows, the title in the display face, the
+    citation under it in small sans. The year stays inside the citation, where
+    it is part of the reference — railing it down the margin is Record's
+    device, and doing it here as well would make two designs look like one.
+  */
+  :root[data-theme='b'] .pubs {
+    gap: 0;
+    max-inline-size: none;
+  }
+  :root[data-theme='b'] .pub {
+    border-block-end: 1px solid var(--color-border);
+    padding-block: var(--space-s);
+  }
+  :root[data-theme='b'] .pub__title {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.15;
+    max-inline-size: var(--measure);
+  }
+  :root[data-theme='b'] .pub__authors,
+  :root[data-theme='b'] .pub__meta { max-inline-size: var(--measure); }
+
+  /*
+    Selected publications are a different thing from the record, so they are
+    set as a different thing: bigger, ruled above rather than below, and with
+    the curated note promoted out of the small print into the margin beside the
+    paper. The note is the only reason the section exists — it is what someone
+    who is not in the field reads instead of the title.
+
+    Keyed off the section id, which the Publications page owns and its in-page
+    index already points at.
+  */
+  :root[data-theme='b'] #selected .pubs { gap: var(--space-l); }
+  :root[data-theme='b'] #selected .pub {
+    border-block-end: 0;
+    border-block-start: var(--rule-strong) solid var(--color-heading);
+    padding-block: var(--space-s) 0;
+  }
+  :root[data-theme='b'] #selected .pub__title { font-size: var(--step-2); }
+  :root[data-theme='b'] #selected .pub > .small {
+    background: var(--color-wash);
+    border-inline-start: var(--rule-strong) solid var(--color-accent);
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-style: italic;
+    line-height: 1.35;
+    margin-block-start: var(--space-2xs);
+    padding: var(--space-2xs) var(--space-s);
+  }
+
+  @media (min-width: 48rem) {
+    :root[data-theme='b'] #selected .pub {
+      column-gap: var(--space-l);
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    }
+    :root[data-theme='b'] #selected .pub > :not(.small) { grid-column: 1; }
+    /*
+      Rows 1-3 are the title, the authors and the citation. Counted forward
+      rather than to `-1`, which resolves against the explicit grid — and this
+      grid has no explicit rows, so `-1` would land back on row 1.
+    */
+    :root[data-theme='b'] #selected .pub > .small {
+      align-self: start;
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      margin-block-start: 0;
+    }
+  }
+
+  /*
+    News and events are the same row with a date where the citation goes, and
+    left alone they were a reading column with the margin track empty beside
+    them - the one place in this design where the wide right-hand column pays
+    for nothing. The date moves into it as a dateline, which is what a magazine
+    does with one, and which is the same device the selected publications use
+    for their annotation two blocks up.
+
+    Not Record's rail: that sets the year first, in the margin the text is
+    indented past. This sets the date last, out to the right of the entry, and
+    the two pages read as opposite decisions rather than the same one.
+  */
+  :root[data-theme='b'] .pubs--dated .pub__meta { color: var(--color-muted); }
+
+  @media (min-width: 48rem) {
+    :root[data-theme='b'] .pubs--dated .pub {
+      column-gap: var(--space-l);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+    }
+    :root[data-theme='b'] .pubs--dated .pub > * { grid-column: 1; }
+    :root[data-theme='b'] .pubs--dated .pub__meta {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: var(--step-0);
+      grid-column: 2;
+      grid-row: 1;
+      line-height: 1.3;
+      max-inline-size: none;
+    }
+  }
+
+  /* The dateline, in the same italic display the news index sets its dates in. */
+  :root[data-theme='b'] .dateline {
+    color: var(--color-muted);
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-style: italic;
+  }
+
+  /* ---- Cards, ranked like a contents page -------------------------------- */
+
+  :root[data-theme='b'] .cards {
+    column-gap: var(--space-l);
+    row-gap: var(--space-l);
+  }
+  :root[data-theme='b'] .card {
+    background: none;
+    border: 0;
+    border-block-start: 1px solid var(--color-border);
+    padding: var(--space-2xs) 0 0;
+  }
+  :root[data-theme='b'] .card__title {
+    font-size: var(--step-1);
+    line-height: 1.15;
+  }
+
+  @media (min-width: 48rem) {
+    /*
+      Twelve columns, taken 7-5 then 6-6, so each pair of rows is full and the
+      lead entry is visibly the lead. The pattern repeats every four cards; a
+      list of three ends on a half row, which is what a contents page does.
+
+      Seven and five rather than the eight and four this started as: a card
+      title is sometimes a repository name like `LFI_between_country_migration`,
+      which has nowhere to break, and a quarter-width column snaps it mid-word.
+    */
+    :root[data-theme='b'] .cards { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    :root[data-theme='b'] .card { grid-column: span 6; }
+    :root[data-theme='b'] .card:nth-child(4n + 1) {
+      border-block-start: var(--rule-strong) solid var(--color-heading);
+      grid-column: span 7;
+    }
+    :root[data-theme='b'] .card:nth-child(4n + 1) h2 { font-size: var(--step-2); }
+    :root[data-theme='b'] .card:nth-child(4n + 2) { grid-column: span 5; }
+  }
+
+  /*
+    A repository name is an identifier, and this design sets identifiers in the
+    body face. `LFI_between_country_migration` in a display serif is a thing
+    that does not exist anywhere in print: the underscores hang, the optical
+    size draws them for a headline, and the one string on the page that has to
+    be typed exactly is the one set least like text you would type. The
+    contents-page ranking still applies - the lead entry is larger - it just
+    stops being a serif.
+  */
+  :root[data-theme='b'] .card__title--repo {
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 48rem) {
+    :root[data-theme='b'] .card:nth-child(4n + 1) .card__title--repo {
+      font-size: var(--step-1);
+    }
+  }
+
+  /* ---- People ------------------------------------------------------------ */
+
+  :root[data-theme='b'] .people__grid {
+    column-gap: var(--space-l);
+    row-gap: var(--space-l);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  }
+  :root[data-theme='b'] .person {
+    background: none;
+    border: 0;
+    border-block-start: 1px solid var(--color-border);
+    padding: var(--space-2xs) 0 0;
+  }
+  /* A contributor portrait is a portrait: taller than it is wide, and square-cornered. */
+  :root[data-theme='b'] .person__avatar {
+    aspect-ratio: 4 / 5;
+    background: var(--color-wash);
+    color: var(--color-accent);
+    font-family: var(--font-display);
+  }
+  :root[data-theme='b'] .person__name {
+    font-size: var(--step-1);
+    line-height: 1.15;
+    margin-block-start: var(--space-3xs);
+  }
+  /* The mark, in this design's own voice: an editor's note, like the others. */
+  :root[data-theme='b'] .person__placeholder {
+    font-family: var(--font-display);
+    font-style: italic;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :root[data-theme='b'] .people__summary {
+    color: var(--color-accent);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-style: italic;
+  }
+
+  /* ---- Long-form pages --------------------------------------------------- */
+
+  :root[data-theme='b'] .toc { background: var(--color-surface); }
+  :root[data-theme='b'] .toc h2 {
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-style: italic;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :root[data-theme='b'] .manual h3 { font-size: var(--step-0); }
+  :root[data-theme='b'] .manual summary { font-family: var(--font-display); font-style: italic; }
+  :root[data-theme='b'] .manual thead th { letter-spacing: 0.08em; }
+
+  /* ---- Footer: the colophon ---------------------------------------------- */
+
+  :root[data-theme='b'] .footer {
+    border-block-start: var(--rule-heavy) double var(--color-heading);
+    margin-block-start: var(--space-2xl);
+  }
+  :root[data-theme='b'] .footer__inner {
+    display: grid;
+    gap: var(--space-3xs) var(--space-l);
+  }
+  :root[data-theme='b'] .footer__inner > p:first-child {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  @media (min-width: 48rem) {
+    /*
+      The lab's name against the taxonomy the running head leaves out. The
+      first line is placed; the rest fall into the second column in order,
+      which keeps the footer honest as `site.json` grows a field.
+    */
+    :root[data-theme='b'] .footer__inner {
+      align-items: start;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    }
+    :root[data-theme='b'] .footer__inner > p:first-child { grid-area: 1 / 1 / 2 / 2; }
+    :root[data-theme='b'] .footer__inner > p:not(:first-child) { grid-column: 2; }
+  }
+
+  /* ---- Demo chrome ------------------------------------------------------- */
+
+  /*
+    The placeholder marker, set as an editor's note rather than as a dashed
+    box. It has to stay loud — it is the difference between a demo and a claim
+    about her work — so the label keeps the accent and gains a rule the width
+    of the note.
+  */
+  :root[data-theme='b'] .demo-note {
+    border: 0;
+    border-inline-start: var(--rule-heavy) solid var(--color-accent);
+    color: var(--color-text);
+    padding: var(--space-3xs) 0 var(--space-3xs) var(--space-s);
+  }
+  :root[data-theme='b'] .demo-note strong {
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+}
+
+@layer utilities {
+  :root[data-theme='b'] .themed[data-themes~='b'] { display: contents; }
+}

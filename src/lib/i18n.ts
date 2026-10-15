@@ -67,6 +67,10 @@ const en = {
   preprint: 'Preprint',
   etAl: 'et al.',
 
+  designPreviewLabel: 'Design preview',
+  previewDesign: 'Preview design',
+  theThreeDesigns: 'The three designs',
+
   lastUpdatedFrom: 'Last updated from',
   lastUpdatedOn: 'on',
 
@@ -106,6 +110,9 @@ const fr: Record<StringKey, string> = {
   allPublications: 'Toutes les publications',
   preprint: 'Prépublication',
   etAl: 'et al.',
+  designPreviewLabel: 'Aperçu du design',
+  previewDesign: 'Aperçu du design',
+  theThreeDesigns: 'Les trois designs',
 
   lastUpdatedFrom: 'Dernière mise à jour depuis',
   lastUpdatedOn: 'le',
@@ -146,6 +153,9 @@ const es: Record<StringKey, string> = {
   allPublications: 'Todas las publicaciones',
   preprint: 'Prepublicación',
   etAl: 'et al.',
+  designPreviewLabel: 'Vista previa del diseño',
+  previewDesign: 'Vista previa del diseño',
+  theThreeDesigns: 'Los tres diseños',
 
   lastUpdatedFrom: 'Última actualización desde',
   lastUpdatedOn: 'el',

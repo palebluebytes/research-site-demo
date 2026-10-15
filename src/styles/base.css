@@ -121,6 +121,81 @@
 }
 
 @layer components {
+  /*
+    Per-design markup, from the Themed component. The switcher swaps
+    `data-theme` without reloading, so a variant cannot be picked at build
+    time: every variant ships in the page and each design's stylesheet reveals
+    the ones that are its own. `display: none` takes the rest out of the
+    accessibility tree as well as off the screen, so a screen reader hears one
+    version and not three.
+
+    Hidden by default, revealed by name. The other way round - shown by default
+    and hidden by everyone else - means a design that forgets to hide one shows
+    three stacked blocks, and failing closed makes a forgotten reveal a missing
+    block instead. A missing block is obvious; three stacked ones read as a
+    layout bug somewhere else entirely.
+  */
+  /*
+    Shared defaults for the components that arrived after the designs did.
+
+    Each of these was added while there was only one design, so its neutral
+    structure went into that design's stylesheet along with its expressive
+    choices - which was invisible until a second design existed and inherited
+    nothing. A component's *structure* belongs here, where every design gets
+    it; what a design does with it belongs in that design's own file.
+
+    None of this styles anything. It is the minimum that stops a component
+    arriving broken in a design that has not spoken about it yet.
+  */
+
+  /* An SVG beside text sizes to the text, in any design. */
+  .icon {
+    block-size: 1.15em;
+    fill: currentColor;
+    flex: none;
+    inline-size: 1.15em;
+  }
+
+  /*
+    The year is emitted twice: once on its own for a design that rails the
+    years down the margin, and once inside the meta line for the designs that
+    read it as part of the citation. The citation copy is the default, because
+    a year inside its citation is what a year normally is; the rail is one
+    design's device and that design turns this around. Whichever is unused is
+    `display: none` rather than hidden, so it leaves the accessibility tree too
+    and the year is announced once.
+  */
+  .pub__year { display: none; }
+
+  /*
+    The in-page index. The number and the label are separate elements so a
+    design can rail the numbers, colour them, or drop them entirely; with
+    nothing said they are simply two words that need a space between them,
+    which is what this is.
+  */
+  .section-index__list { list-style: none; margin: 0; padding: 0; }
+  .section-index__item a { align-items: baseline; display: flex; gap: 0.6em; }
+
+  /* A run of links across the line, which is what both of these are. */
+  .locale-nav,
+  .link-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /*
+    The field name beside each identity line. Real text in the markup, so a
+    screen reader reads it and a translator can reach it, and hidden here
+    because only one of the three designs sets that block as a keyed rail.
+  */
+  .identity__key { display: none; }
+
+  .themed { display: none; }
+
   .identity { display: flex; flex-direction: column; gap: var(--space-2xs); }
   .identity__name { font-size: var(--step-3); margin: 0; }
   .identity__photo {
