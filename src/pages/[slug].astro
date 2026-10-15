@@ -1,0 +1,24 @@
+---
+/**
+ * Every Page-collection entry but the home page, in the default locale.
+ *
+ * The French twin is `src/pages/fr/[slug].astro`. Both enumerate the same
+ * entries - a page exists or it does not, independently of language - and both
+ * hand off to `ContentPage`, which picks the translated title off the entry.
+ */
+import { getCollection } from 'astro:content';
+import ContentPage from '../components/pages/ContentPage.astro';
+import { SHELVED_PAGES } from '../lib/nav.ts';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages
+    // Home is the index route, not a slug. The shelved ones are entries the
+    // CMS still edits and the site does not publish yet - see `SHELVED_PAGES`.
+    .filter((page) => page.id !== 'home' && !SHELVED_PAGES.includes(page.id))
+    .map((page) => ({ params: { slug: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+---
+<ContentPage locale="en" page={page} />

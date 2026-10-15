@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-10-15T00:00:00.000Z",
+  "orcid": "0000-0000-0000-0000",
+  "works": [
+    {
+      "putCode": 100000001,
+      "title": "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+      "type": "journal-article",
+      "year": "2024",
+      "journal": "Northmoor Journal of Freshwater Science",
+      "doi": "10.0000/nmr.2024.0117",
+      "url": "https://doi.org/10.0000/nmr.2024.0117",
+      "authors": ["Esme Tarrant", "A. Ipsum", "B. Dolor", "C. Amet"]
+    },
+    {
+      "putCode": 100000002,
+      "title": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+      "type": "journal-article",
+      "year": "2024",
+      "journal": "Northmoor Review of Catchment Ecology",
+      "doi": "10.0000/fwb.2024.0088",
+      "url": "https://doi.org/10.0000/fwb.2024.0088",
+      "authors": ["D. Consectetur", "Esme Tarrant", "E. Adipiscing"]
+    },
+    {
+      "putCode": 100000003,
+      "title": "Ut enim ad minim veniam quis nostrud exercitation ullamco",
+      "type": "journal-article",
+      "year": "2023",
+      "journal": "Northmoor Proceedings in Hydrobiology",
+      "doi": "10.0000/jae.2023.0415",
+      "url": "https://doi.org/10.0000/jae.2023.0415",
+      "authors": ["Esme Tarrant", "F. Tempor", "G. Incididunt", "H. Labore", "I. Dolore", "J. Magna", "K. Aliqua"]
+    },
+    {
+      "putCode": 100000004,
+      "title": "Duis aute irure dolor in reprehenderit in voluptate velit",
+      "type": "preprint",
+      "year": "2026",
+      "journal": null,
+      "doi": "10.0000/preprint.2026.0031",
+      "url": "https://doi.org/10.0000/preprint.2026.0031",
+      "authors": ["L. Veniam", "Esme Tarrant"]
+    },
+    {
+      "putCode": 100000005,
+      "title": "Excepteur sint occaecat cupidatat non proident sunt in culpa",
+      "type": "journal-article",
+      "year": "2023",
+      "journal": "Northmoor Bulletin of River Science",
+      "doi": "10.0000/csl.2023.0202",
+      "url": "https://doi.org/10.0000/csl.2023.0202",
+      "authors": ["M. Nostrud", "A. Ipsum", "Esme Tarrant", "F. Tempor"]
+    },
+    {
+      "putCode": 100000006,
+      "title": "Nemo enim ipsam voluptatem quia voluptas sit aspernatur",
+      "type": "journal-article",
+      "year": "2022",
+      "journal": "Northmoor Ecological Monographs",
+      "doi": "10.0000/nem.2022.0144",
+      "url": "https://doi.org/10.0000/nem.2022.0144",
+      "authors": ["Esme Tarrant", "N. Aliquip"]
+    },
+    {
+      "putCode": 100000007,
+      "title": "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet",
+      "type": "journal-article",
+      "year": "2021",
+      "journal": "Northmoor Review of Catchment Ecology",
+      "doi": "10.0000/fwb.2021.0076",
+      "url": "https://doi.org/10.0000/fwb.2021.0076",
+      "authors": ["B. Dolor", "Esme Tarrant", "C. Amet"]
+    },
+    {
+      "putCode": 100000008,
+      "title": "At vero eos et accusamus et iusto odio dignissimos ducimus",
+      "type": "book-chapter",
+      "year": "2020",
+      "journal": "Northmoor Studies in Water Method",
+      "doi": "10.0000/mce.2020.0009",
+      "url": "https://doi.org/10.0000/mce.2020.0009",
+      "authors": ["Esme Tarrant"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Esme Tarrant",
+  "jobTitle": "Associate Professor",
+  "discipline": "Freshwater Ecologist",
+  "department": "Department of Freshwater Science",
+  "institution": "Northmoor University",
+  "labName": "Tarrant Lab",
+  "photo": "/uploads/profile.jpg",
+  "email": "e.tarrant@northmoor.example",
+  "office": "River Systems Building, Office 214",
+  "address": "Northmoor University, Northmoor NM4 2QR, United Kingdom",
+  "orcid": "0000-0000-0000-0000"
+}

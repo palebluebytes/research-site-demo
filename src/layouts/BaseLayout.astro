@@ -1,0 +1,229 @@
+---
+import { getCollection } from 'astro:content';
+import Fonts from '../components/Fonts.astro';
+import Tokens from '../components/Tokens.astro';
+import Identity from '../components/Identity.astro';
+import { site } from '../lib/site.ts';
+import { NAV, SHELVED_PAGES, url, isCurrent, type NavItem } from '../lib/nav.ts';
+import { isIndexable } from '../lib/env.ts';
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  LOCALE_NAMES,
+  LOCALE_TAGS,
+  alternatesFor,
+  localePath,
+  t,
+  type Locale,
+} from '../lib/i18n.ts';
+import '../styles/base.css';
+// The design's own file, extending the layers base.css declares. Imported
+// after it so a same-specificity rule resolves in the design's favour.
+import '../styles/design.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Keeps internal-facing pages out of search results. */
+  noindex?: boolean;
+  /** Marks the page whose subject is the person, so their name is its heading. */
+  identityIsHeading?: boolean;
+  /** The reader's language. Decides `lang`, every interface string and the menu. */
+  locale?: Locale;
+  /**
+   * This page's path with no locale prefix - `/publications`, not
+   * `/fr/publications`. It is what `hreflang` and the language switcher need:
+   * both have to name the same page in another language, and neither can work
+   * that out from the current URL without stripping a prefix back off it.
+   */
+  path?: string;
+}
+const {
+  title,
+  description,
+  noindex,
+  identityIsHeading,
+  locale = DEFAULT_LOCALE,
+  path = '/',
+} = Astro.props;
+
+const s = t(locale);
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(url(site.photo), Astro.site);
+const fullTitle = `${title} | ${site.name}`;
+const summary =
+  description ??
+  s('siteSummary', { name: site.name, jobTitle: site.jobTitle, institution: site.institution });
+
+/*
+ * Every language's version of this page, absolute, for `hreflang`. A crawler
+ * is told which URLs are translations of each other rather than left to infer
+ * it from a path that happens to start with a language code - and `x-default`
+ * below says which one to serve a reader whose language is neither.
+ */
+const alternates = alternatesFor(path).map(({ locale: alt, path: altPath }) => ({
+  locale: alt,
+  href: new URL(url(altPath), Astro.site).href,
+}));
+
+const pages = await getCollection('pages');
+const pageNav: NavItem[] = pages
+  .filter((page) => (page.data.showInNav as boolean) && !SHELVED_PAGES.includes(page.id))
+  .map((page) => ({
+    // A Page's name is content, so its translation is content too: it comes
+    // off the entry's `title_fr`, declared in the schema, and falls back to
+    // the authored title rather than to a key nobody wrote.
+    label:
+      (locale === DEFAULT_LOCALE
+        ? (page.data.title as string)
+        : ((page.data[`title_${locale}`] as string | undefined) ?? (page.data.title as string))),
+    href: page.id === 'home' ? '/' : `/${page.id}`,
+    order: page.data.order as number,
+  }));
+
+const nav = [...pageNav, ...NAV].sort((a, b) => a.order - b.order);
+const pathname = Astro.url.pathname;
+
+/*
+ * The switcher's links, resolved against the base like any other href.
+ *
+ * It sits in the footer rather than beside the menu, which is the one
+ * placement decision here worth stating. The design's grid has three children
+ * and their placement is pinned by a test; a fourth landmark in that cell
+ * would be a layout change made for a control that a reader uses once per
+ * visit at most. The discovery job is done by `hreflang` and by `lang` on each
+ * link, which is what a crawler and a screen reader read - the footer copy is
+ * for the reader who wants to choose by hand.
+ */
+const localeLinks = LOCALES.map((alt) => ({
+  locale: alt,
+  href: url(localePath(alt, path)),
+  current: alt === locale,
+}));
+---
+<html lang={LOCALE_TAGS[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={summary} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((alternate) => (
+      <link rel="alternate" hreflang={LOCALE_TAGS[alternate.locale]} href={alternate.href} />
+    ))}
+    {/*
+      The unprefixed URLs are the default locale's, so they are also what a
+      reader with no matching language should get.
+    */}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={alternates.find((alternate) => alternate.locale === DEFAULT_LOCALE)!.href}
+    />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <meta name="theme-color" content="#1f6a73" />
+    {(noindex || !isIndexable) && <meta name="robots" content="noindex" />}
+
+    <!-- Link previews: this URL gets pasted into email and chat. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.labName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={summary} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={LOCALE_TAGS[locale].replace('-', '_')} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <Fonts />
+    <Tokens />
+  </head>
+  <body>
+    <a class="skip" href="#main">{s('skipToContent')}</a>
+
+    {/*
+      Source order is reading order: navigation, the identity block, then the
+      content — and inside the content, the page's own title, its index and
+      then the page. Grid placement moves the picture and not the document, so
+      anyone following the page by keyboard or by screen reader gets this order
+      whatever width they are at.
+
+      The in-page index is not here. It belongs between a page's title and the
+      page, and both of those are inside <main>, so no arrangement of this grid
+      can put it there — a sibling of <main> can only go above the whole
+      article or below it. The pages that have one render it themselves, after
+      their <h1>; `design.css` puts it in the third column of the module above
+      62rem and leaves it where it is below.
+
+      It used to be a `rail` slot emitted here, drawn as a strip above the
+      article on a phone. That put a page's contents ahead of the page's title:
+      a reader met "01 Core research themes" before they met "Research".
+
+      Above 62rem the menu sits under the identity inside the left column, so
+      the two are the other way round on screen. That is the one place the
+      order is not literal, and it is the right way round for a reader who
+      cannot see the column: the site's navigation before the site's name.
+    */}
+    <div class="page">
+      <nav class="site-nav nav" aria-label={s('navPrimaryLabel')}>
+        {nav.map((item) => {
+          const href = localePath(locale, item.href);
+          return (
+            <a href={url(href)} aria-current={isCurrent(href, pathname) ? 'page' : undefined}>
+              {item.labelKey ? s(item.labelKey) : item.label}
+            </a>
+          );
+        })}
+      </nav>
+
+      {/*
+        <header>, not <aside>. This is the site's identity on every page and on
+        the home page it holds the <h1>; the complementary landmark says the
+        opposite of both.
+      */}
+      <header class="identity-column">
+        <Identity primary={identityIsHeading} />
+      </header>
+
+      <main id="main" class="flow prose">
+        <slot />
+      </main>
+    </div>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <p>&copy; {new Date().getFullYear()} {site.labName}</p>
+        <p>{site.name}</p>
+        {/*
+          The address block is the only place the email appears, and it was
+          plain text: on a phone the one action an academic site exists to
+          support could not be tapped, only selected and copied out of grey
+          fine print. A single link in a block of text is exactly the case the
+          accent is reserved for, so it keeps it.
+        */}
+        <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+        <p>{site.jobTitle} | {site.department}</p>
+        {site.office && <p>{site.office}</p>}
+        {site.address && <p>{site.address}</p>}
+
+        {/*
+          Each link carries `lang` as well as `hreflang`: `hreflang` tells a
+          crawler what is on the other end, and `lang` tells a screen reader
+          how to pronounce the word in front of it. Without the second one
+          "Français" is announced in the voice of the surrounding page, which
+          is how a language switcher ends up unreadable to the reader most
+          likely to need it.
+        */}
+        <nav class="locale-nav" aria-label={s('languageNavLabel')}>
+          {localeLinks.map((link) => (
+            <a
+              href={link.href}
+              lang={LOCALE_TAGS[link.locale]}
+              hreflang={LOCALE_TAGS[link.locale]}
+              aria-current={link.current ? 'true' : undefined}
+            >{LOCALE_NAMES[link.locale]}</a>
+          ))}
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

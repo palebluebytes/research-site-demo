@@ -1,0 +1,25 @@
+<!--
+  The lab mark: a "T", knocked out of the accent.
+
+  Proportioned to the tile rather than eyeballed, and to the same measurements
+  the mark it replaced used: a cap height of 58.8% of the tile, centred both
+  ways, a corner radius of 8.8% of the side, and a stroke of 13.62% of the cap.
+  The stroke is what sets the weight, and at this size it is the only number
+  that matters - heavier and the arm and the stem fuse at the junction, lighter
+  and the whole mark disappears against a busy tab strip.
+
+  The letter is drawn as an outline rather than a <text> element, because a
+  favicon is rendered in a context that loads no webfonts: `font-family` there
+  falls back to whatever the machine happens to have, so the one thing a mark
+  must do - look the same everywhere - is the one thing <text> cannot promise.
+  A T is simple enough to construct exactly, so it is constructed rather than
+  traced: an arm and a stem on the cap-height grid, in one closed path.
+
+  The ground is the site accent, from src/lib/design.ts. If that token changes
+  this file has to change with it - a mark in one colour beside a site in
+  another reads as two sites.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Tarrant Lab">
+  <rect width="32" height="32" rx="2.81" fill="#1f6a73" />
+  <path fill="#ffffff" d="M8 6.6H24V9.16H17.28V25.41H14.72V9.16H8Z" />
+</svg>

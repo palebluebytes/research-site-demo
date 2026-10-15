@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import ContentPage from '../../components/pages/ContentPage.astro';
+import { SHELVED_PAGES } from '../../lib/nav.ts';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages
+    .filter((page) => page.id !== 'home' && !SHELVED_PAGES.includes(page.id))
+    .map((page) => ({ params: { slug: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+---
+<ContentPage locale="fr" page={page} />

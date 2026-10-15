@@ -1,0 +1,44 @@
+---
+/**
+ * Any Page-collection entry that is not the home page, in one language.
+ *
+ * Routed by `[slug].astro` under each locale. The heading comes off the
+ * entry's translated title; the in-page index comes off the Markdown headings,
+ * which means a page written in the CMS gets one without anyone adding
+ * anchors by hand.
+ */
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionIndex from '../SectionIndex.astro';
+import { DEFAULT_LOCALE, t, type Locale } from '../../lib/i18n.ts';
+
+interface Props {
+  locale: Locale;
+  page: CollectionEntry<'pages'>;
+}
+const { locale, page } = Astro.props;
+const s = t(locale);
+
+const { Content, headings } = await render(page);
+
+const title =
+  locale === DEFAULT_LOCALE
+    ? (page.data.title as string)
+    : ((page.data[`title_${locale}`] as string | undefined) ?? (page.data.title as string));
+const description =
+  locale === DEFAULT_LOCALE
+    ? (page.data.description as string | undefined)
+    : ((page.data[`description_${locale}`] as string | undefined) ??
+      (page.data.description as string | undefined));
+
+// Only the top level of the outline: an index that mirrors the whole thing is
+// a second copy of the page.
+const sections: [string, string][] = headings
+  .filter((heading) => heading.depth === 2)
+  .map((heading) => [heading.slug, heading.text]);
+---
+<BaseLayout title={title} description={description} locale={locale} path={`/${page.id}`}>
+  <h1>{title}</h1>
+  <SectionIndex sections={sections} heading={s('onThisPage')} />
+  <Content />
+</BaseLayout>

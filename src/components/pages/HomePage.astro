@@ -1,0 +1,60 @@
+---
+/**
+ * The home page, in one language.
+ *
+ * Routed twice - `src/pages/index.astro` and `src/pages/fr/index.astro` - so
+ * the body lives here instead of in either of them. A locale that only ever
+ * differs by a prop is not a second page, and two copies of a page is how the
+ * French one ends up a release behind the English one.
+ */
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DEFAULT_LOCALE, type Locale } from '../../lib/i18n.ts';
+// Commented out with the strip below, because an import nothing uses fails
+// `astro check` under the strict config.
+// import FunderStrip from '../FunderStrip.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const page = await getEntry('pages', 'home');
+if (!page) throw new Error('Missing src/content/pages/home.md');
+const { Content } = await render(page);
+
+const title =
+  locale === DEFAULT_LOCALE
+    ? (page.data.title as string)
+    : ((page.data[`title_${locale}`] as string | undefined) ?? (page.data.title as string));
+const description =
+  locale === DEFAULT_LOCALE
+    ? (page.data.description as string | undefined)
+    : ((page.data[`description_${locale}`] as string | undefined) ??
+      (page.data.description as string | undefined));
+---
+<BaseLayout title={title} description={description} locale={locale} path="/" identityIsHeading>
+  {/*
+    The body is the same Markdown in both languages. That is a property of this
+    demo's content rather than of the design: the prose here is placeholder
+    text, which has no language, so there is nothing to translate and a second
+    file would be the same bytes under another name. Translated body copy is a
+    per-locale entry in the pages collection, the way `title_fr` is a
+    per-locale field - the schema is where that gets declared, and both the
+    validator and the CMS form follow from it.
+  */}
+  <Content />
+
+  {/*
+    The home page used to close on who funds the work, and should again once
+    the awards are real. `src/data/fixtures/funders.json` still holds three
+    stand-ins - "FBN, Funding Body Name" and two more - and with the demo
+    notices gone there is nothing on the page left to say so. Replace the
+    contents of that file and uncomment this and the import above.
+
+    Commented rather than deleted for the same reason the seven shelved
+    sections are only underscore-prefixed: this is waiting on content, not on
+    a decision. See `src/lib/nav.ts`.
+  */}
+  {/* <FunderStrip /> */}
+</BaseLayout>
